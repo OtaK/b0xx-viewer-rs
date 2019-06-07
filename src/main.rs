@@ -26,18 +26,14 @@ fn main() -> Result<(), ViewerError> {
         ..Default::default()
     };
 
-    let mut buf = Vec::with_capacity(24);
+    let mut buf = Vec::with_capacity(18);
     let port = serialport::open_with_settings(&b0xx_port.port_name, &port_settings)?;
     port.bytes()
         .try_for_each(|b: Result<u8, std::io::Error>| -> Result<(), ViewerError> {
             let report: B0xxReport = b?.into();
             match report {
                 B0xxReport::End => {
-                    for (i, value) in buf.iter().enumerate() {
-                        println!("Buf pos {}: {:?}", i, value);
-                    }
                     let state: B0xxState = buf.as_slice().into();
-
                     println!("{:#?}", state);
                     buf.clear();
                 }

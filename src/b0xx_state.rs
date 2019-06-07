@@ -62,12 +62,12 @@ impl From<&[B0xxReport]> for B0xxState {
     fn from(value: &[B0xxReport]) -> Self {
         let mut ret = Self::default();
         ret.start = value[0].into();
-        ret.r = value[1].into();
+        ret.y = value[1].into();
         ret.x = value[2].into();
         ret.b = value[3].into();
         ret.a = value[4].into();
         ret.l = value[5].into();
-        ret.y = value[6].into();
+        ret.r = value[6].into();
         ret.z = value[7].into();
         ret.up = value[8].into();
         ret.down = value[9].into();
