@@ -1,17 +1,19 @@
 #[macro_use]
 extern crate log;
 
-pub mod b0xx_state;
-mod error;
+#[macro_use]
+extern crate conrod_winit;
 
+mod b0xx_state;
+mod error;
 mod serial_probe;
-use self::serial_probe::run_serial_probe;
+mod ui;
 
 pub use self::error::*;
 
 pub fn main() {
     pretty_env_logger::init();
-    let rx = match run_serial_probe() {
+    let rx = match serial_probe::run_serial_probe() {
         Ok(rx) => rx,
         Err(e) => {
             error!("{}", e);
