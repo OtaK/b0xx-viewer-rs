@@ -1,6 +1,3 @@
-//000000000000000000000000
-//                         000000000000000000000000
-
 #[derive(Debug, Clone, Copy, Eq, PartialEq)]
 #[repr(u8)]
 pub enum B0xxReport {
@@ -38,48 +35,73 @@ impl From<u8> for B0xxReport {
 
 #[derive(Debug, Default, Clone, Copy, Eq, PartialEq)]
 pub struct B0xxState {
-    l: bool,
     start: bool,
-    left: bool,
-    down: bool,
-    right: bool,
-    c_up: bool,
-    c_down: bool,
-    c_left: bool,
-    c_right: bool,
-    a: bool,
     y: bool,
-    r: bool,
-    b: bool,
     x: bool,
+    b: bool,
+    a: bool,
+    l: bool,
+    r: bool,
     z: bool,
     up: bool,
+    down: bool,
+    right: bool,
+    left: bool,
     mod_x: bool,
     mod_y: bool,
+    c_left: bool,
+    c_right: bool,
+    c_up: bool,
+    c_down: bool,
+}
+
+#[cfg(feature = "fake_serial")]
+impl B0xxState {
+    pub fn random() -> Self {
+        B0xxState {
+            start: rand::random::<bool>(),
+            y: rand::random::<bool>(),
+            x: rand::random::<bool>(),
+            b: rand::random::<bool>(),
+            a: rand::random::<bool>(),
+            l: rand::random::<bool>(),
+            r: rand::random::<bool>(),
+            z: rand::random::<bool>(),
+            up: rand::random::<bool>(),
+            down: rand::random::<bool>(),
+            right: rand::random::<bool>(),
+            left: rand::random::<bool>(),
+            mod_x: rand::random::<bool>(),
+            mod_y: rand::random::<bool>(),
+            c_left: rand::random::<bool>(),
+            c_right: rand::random::<bool>(),
+            c_up: rand::random::<bool>(),
+            c_down: rand::random::<bool>(),
+        }
+    }
 }
 
 impl From<&[B0xxReport]> for B0xxState {
     fn from(value: &[B0xxReport]) -> Self {
-        let mut ret = Self::default();
-        ret.start = value[0].into();
-        ret.y = value[1].into();
-        ret.x = value[2].into();
-        ret.b = value[3].into();
-        ret.a = value[4].into();
-        ret.l = value[5].into();
-        ret.r = value[6].into();
-        ret.z = value[7].into();
-        ret.up = value[8].into();
-        ret.down = value[9].into();
-        ret.right = value[10].into();
-        ret.left = value[11].into();
-        ret.mod_x = value[12].into();
-        ret.mod_y = value[13].into();
-        ret.c_left = value[14].into();
-        ret.c_right = value[15].into();
-        ret.c_up = value[16].into();
-        ret.c_down = value[17].into();
-
-        ret
+        B0xxState {
+            start: value[0].into(),
+            y: value[1].into(),
+            x: value[2].into(),
+            b: value[3].into(),
+            a: value[4].into(),
+            l: value[5].into(),
+            r: value[6].into(),
+            z: value[7].into(),
+            up: value[8].into(),
+            down: value[9].into(),
+            right: value[10].into(),
+            left: value[11].into(),
+            mod_x: value[12].into(),
+            mod_y: value[13].into(),
+            c_left: value[14].into(),
+            c_right: value[15].into(),
+            c_up: value[16].into(),
+            c_down: value[17].into(),
+        }
     }
 }
