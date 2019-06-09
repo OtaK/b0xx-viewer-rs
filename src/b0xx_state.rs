@@ -1,9 +1,11 @@
+use std::convert::TryFrom;
+
 #[derive(Debug, Clone, Copy, Eq, PartialEq)]
 #[repr(u8)]
 pub enum B0xxReport {
-    Off = 0x30,
-    On = 0x31,
-    End = 0x0A,
+    Off = b'0',
+    On = b'1',
+    End = b'\n',
     Invalid = 0x00,
 }
 
@@ -25,9 +27,9 @@ impl Default for B0xxReport {
 impl From<u8> for B0xxReport {
     fn from(value: u8) -> Self {
         match value {
-            0x30 => B0xxReport::Off,
-            0x31 => B0xxReport::On,
-            0x0A => B0xxReport::End,
+            b'0' => B0xxReport::Off,
+            b'1' => B0xxReport::On,
+            b'\n' => B0xxReport::End,
             _ => B0xxReport::Invalid,
         }
     }
@@ -81,9 +83,15 @@ impl B0xxState {
     }
 }
 
-impl From<&[B0xxReport]> for B0xxState {
-    fn from(value: &[B0xxReport]) -> Self {
-        B0xxState {
+impl TryFrom<&[B0xxReport]> for B0xxState {
+    type Error = crate::error::ViewerError;
+
+    fn try_from(value: &[B0xxReport]) -> Result<Self, Self::Error> {
+        if value.len() < 18 {
+            return Err(crate::error::ViewerError::MalformedSerialReport);
+        }
+
+        Ok(B0xxState {
             start: value[0].into(),
             y: value[1].into(),
             x: value[2].into(),
@@ -102,6 +110,6 @@ impl From<&[B0xxReport]> for B0xxState {
             c_right: value[15].into(),
             c_up: value[16].into(),
             c_down: value[17].into(),
-        }
+        })
     }
 }

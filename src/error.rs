@@ -22,6 +22,8 @@ pub enum ViewerError {
     SerialPortError(serialport::Error),
     #[fail(display = "Internal serial thread error: {}", _0)]
     SerialThreadError(crossbeam_channel::RecvError),
+    #[fail(display = "The state report transmitted over serial was malformed")]
+    MalformedSerialReport,
     #[fail(display = "An unknown error occured, sorry")]
     UnknownError,
 }

@@ -1,12 +1,10 @@
 mod app;
-//mod event_loop;
 mod gui;
 mod support;
 
-//use self::event_loop::*;
 use self::support::*;
-use crate::b0xx_state::B0xxState;
 use crate::error::ViewerError;
+use crate::serial_probe::*;
 
 use conrod_core::widget_ids;
 use conrod_glium::Renderer;
@@ -38,7 +36,7 @@ widget_ids! {
     }
 }
 
-pub fn start_gui(rx: crossbeam_channel::Receiver<Result<B0xxState, ViewerError>>) {
+pub fn start_gui(mut rx: crossbeam_channel::Receiver<B0xxMessage>) {
     // Build the window.
     let mut events_loop = glium::glutin::EventsLoop::new();
 
@@ -49,7 +47,7 @@ pub fn start_gui(rx: crossbeam_channel::Receiver<Result<B0xxState, ViewerError>>
         .with_dimensions((WIN_W, WIN_H).into());
 
     let context = glium::glutin::ContextBuilder::new()
-        //.with_vsync(true)
+        .with_vsync(true)
         .with_multisampling(4);
 
     let display = glium::Display::new(window, context, &events_loop).unwrap();
@@ -71,22 +69,42 @@ pub fn start_gui(rx: crossbeam_channel::Receiver<Result<B0xxState, ViewerError>>
 
     let mut pending_events = Vec::new();
 
-    //let mut event_loop = EventLoop::new();
     'main: loop {
-        let mut maybe_state = match rx.recv().map_err(Into::into) {
-            Ok(Ok(state)) => {
-                debug!("{:#?}", state);
-                Some(state)
-            }
-            Ok(Err(e)) | Err(e) => {
+        let mut maybe_state = match rx.recv().map_err(ViewerError::from) {
+            Ok(message) => match message {
+                B0xxMessage::State(state) => {
+                    debug!("{:#?}", state);
+                    Some(state)
+                }
+                B0xxMessage::Error(e) => {
+                    error!("{}", e);
+                    None
+                }
+                B0xxMessage::Quit => {
+                    break 'main;
+                }
+                B0xxMessage::Reconnect => {
+                    loop {
+                        match start_serial_probe() {
+                            Ok(new_rx) => {
+                                rx = new_rx;
+                                break;
+                            }
+                            Err(_) => {}
+                        }
+                    }
+
+                    None
+                }
+            },
+            Err(e) => {
                 error!("{}", e);
-                None
+                break 'main;
             }
         };
 
         if let Some(new_state) = maybe_state.take() {
             let changed = app.update_state(new_state);
-            debug!("changed {:?}", changed);
             if changed {
                 ui.handle_event(conrod_core::event::Input::Redraw);
             }
