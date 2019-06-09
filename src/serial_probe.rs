@@ -1,9 +1,16 @@
 use crate::b0xx_state::*;
 use crate::error::ViewerError;
 
+#[derive(Debug)]
+pub enum B0xxMessage {
+    State(B0xxState),
+    Error(ViewerError),
+    Reconnect,
+    Quit,
+}
+
 #[cfg(not(feature = "fake_serial"))]
-pub fn start_serial_probe(
-) -> Result<crossbeam_channel::Receiver<Result<B0xxState, ViewerError>>, ViewerError> {
+pub fn start_serial_probe() -> Result<crossbeam_channel::Receiver<B0xxMessage>, ViewerError> {
     use std::io::Read;
 
     let b0xx_port = serialport::available_ports()?
@@ -40,28 +47,42 @@ pub fn start_serial_probe(
 
         let mut port = match serialport::open_with_settings(&b0xx_port.port_name, &port_settings) {
             Ok(port) => port,
-            Err(e) => return tx.send(Err(e.into())),
+            Err(e) => return tx.send(B0xxMessage::Error(e.into())),
         };
 
         match port.write_request_to_send(true) {
-            Err(e) => return tx.send(Err(e.into())),
+            Err(e) => return tx.send(B0xxMessage::Error(e.into())),
             _ => {}
         }
 
         let loop_tx = tx.clone();
+        let mut schedule_to_send = false;
 
         if let Err(e) = port.bytes().try_for_each(
             move |b: Result<u8, std::io::Error>| -> Result<(), ViewerError> {
+                use std::convert::TryInto as _;
+
                 let report: B0xxReport = b?.into();
                 match report {
                     B0xxReport::End => {
-                        let state: B0xxState = buf.as_slice().into();
-                        let _ = loop_tx.send(Ok(state));
-                        buf.clear();
+                        if let Ok(state) = buf.as_slice().try_into() {
+                            let _ = loop_tx.send(B0xxMessage::State(state));
+                            buf.clear();
+                        } else {
+                            schedule_to_send = true;
+                        }
                     }
                     _ => {
                         if buf.len() < buf.capacity() {
                             buf.push(report);
+                        } else if schedule_to_send {
+                            if let Ok(state) = buf.as_slice().try_into() {
+                                let _ = loop_tx.send(B0xxMessage::State(state));
+                            }
+
+                            buf.clear();
+                            buf.push(report);
+                            schedule_to_send = false;
                         }
                     }
                 }
@@ -69,7 +90,20 @@ pub fn start_serial_probe(
                 Ok(())
             },
         ) {
-            return tx.send(Err(e.into()));
+            if let ViewerError::IoError(io_error) = &e {
+                match io_error.kind() {
+                    std::io::ErrorKind::TimedOut => {
+                        return tx.send(B0xxMessage::Reconnect);
+                    }
+                    _ => {
+                        error!("{}", ViewerError::from(e));
+                        return tx.send(B0xxMessage::Quit);
+                    }
+                }
+            } else {
+                error!("{}", ViewerError::from(e));
+                return tx.send(B0xxMessage::Quit);
+            }
         }
 
         Ok(())
@@ -79,12 +113,11 @@ pub fn start_serial_probe(
 }
 
 #[cfg(feature = "fake_serial")]
-pub fn start_serial_probe(
-) -> Result<crossbeam_channel::Receiver<Result<B0xxState, ViewerError>>, ViewerError> {
+pub fn start_serial_probe() -> Result<crossbeam_channel::Receiver<B0xxMessage>, ViewerError> {
     let (tx, rx) = crossbeam_channel::unbounded();
     let wait = std::time::Duration::from_micros(16667);
     std::thread::spawn(move || loop {
-        let _ = tx.send(Ok(B0xxState::random()));
+        let _ = tx.send(B0xxMessage::State(B0xxState::random()));
         std::thread::sleep(wait);
     });
 
