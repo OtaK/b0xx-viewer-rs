@@ -1,10 +1,11 @@
-use crate::b0xx_state::{B0xxReport, B0xxState};
+use crate::b0xx_state::*;
 use crate::error::ViewerError;
-use std::io::Read;
 
 #[cfg(not(feature = "fake_serial"))]
-pub fn run_serial_probe(
-) -> Result<std::sync::mpsc::Receiver<Result<B0xxState, ViewerError>>, ViewerError> {
+pub fn start_serial_probe(
+) -> Result<crossbeam_channel::Receiver<Result<B0xxState, ViewerError>>, ViewerError> {
+    use std::io::Read;
+
     let b0xx_port = serialport::available_ports()?
         .into_iter()
         .find(|port| {
@@ -24,7 +25,7 @@ pub fn run_serial_probe(
         ..Default::default()
     };
 
-    let (tx, rx) = std::sync::mpsc::channel();
+    let (tx, rx) = crossbeam_channel::unbounded();
     std::thread::spawn(move || {
         let mut buf = Vec::with_capacity(18);
 
@@ -38,10 +39,11 @@ pub fn run_serial_probe(
         if let Err(e) = port.bytes().try_for_each(
             move |b: Result<u8, std::io::Error>| -> Result<(), ViewerError> {
                 let report: B0xxReport = b?.into();
+                //debug!("Report {:?}", report);
                 match report {
                     B0xxReport::End => {
                         let state: B0xxState = buf.as_slice().into();
-                        info!("{:#?}", state);
+                        //info!("{:#?}", state);
                         let _ = loop_tx.send(Ok(state));
                         buf.clear();
                     }
@@ -65,10 +67,10 @@ pub fn run_serial_probe(
 }
 
 #[cfg(feature = "fake_serial")]
-pub fn run_serial_probe(
-) -> Result<std::sync::mpsc::Receiver<Result<B0xxState, ViewerError>>, ViewerError> {
-    let (tx, rx) = std::sync::mpsc::channel();
-    let wait = std::time::Duration::from_millis(8);
+pub fn start_serial_probe(
+) -> Result<crossbeam_channel::Receiver<Result<B0xxState, ViewerError>>, ViewerError> {
+    let (tx, rx) = crossbeam_channel::unbounded();
+    let wait = std::time::Duration::from_micros(16667);
     std::thread::spawn(move || loop {
         let _ = tx.send(Ok(B0xxState::random()));
         std::thread::sleep(wait);
