@@ -22,6 +22,6 @@ crossbeam-channel = "0.3.8"
 default = []
 fake_serial = ["rand"]
 
-#[profile.release]
-#lto = true
-#codegen-units = 1
+[profile.release]
+lto = true
+codegen-units = 1

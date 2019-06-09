@@ -10,8 +10,14 @@ pub fn start_serial_probe(
         .into_iter()
         .find(|port| {
             if let serialport::SerialPortType::UsbPort(portinfo) = &port.port_type {
+                if portinfo.vid == 9025 && portinfo.pid == 32822 {
+                    return true;
+                }
+
                 if let Some(product) = &portinfo.product {
-                    return product == "Arduino_Leonardo";
+                    if product == "Arduino_Leonardo" {
+                        return true;
+                    }
                 }
             }
 
@@ -20,9 +26,9 @@ pub fn start_serial_probe(
         .ok_or_else(|| ViewerError::B0xxNotFound)?;
 
     let port_settings = serialport::SerialPortSettings {
-        baud_rate: 3_686_400,
+        baud_rate: 115_200,
         data_bits: serialport::DataBits::Eight,
-        flow_control: serialport::FlowControl::None,
+        flow_control: serialport::FlowControl::Hardware,
         parity: serialport::Parity::None,
         stop_bits: serialport::StopBits::One,
         timeout: std::time::Duration::from_millis(500),
@@ -32,10 +38,15 @@ pub fn start_serial_probe(
     std::thread::spawn(move || {
         let mut buf = Vec::with_capacity(18);
 
-        let port = match serialport::open_with_settings(&b0xx_port.port_name, &port_settings) {
+        let mut port = match serialport::open_with_settings(&b0xx_port.port_name, &port_settings) {
             Ok(port) => port,
             Err(e) => return tx.send(Err(e.into())),
         };
+
+        match port.write_request_to_send(true) {
+            Err(e) => return tx.send(Err(e.into())),
+            _ => {}
+        }
 
         let loop_tx = tx.clone();
 
