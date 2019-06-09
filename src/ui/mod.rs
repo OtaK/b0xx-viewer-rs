@@ -1,5 +1,5 @@
 mod app;
-mod event_loop;
+//mod event_loop;
 mod gui;
 mod support;
 
@@ -49,7 +49,7 @@ pub fn start_gui(rx: crossbeam_channel::Receiver<Result<B0xxState, ViewerError>>
         .with_dimensions((WIN_W, WIN_H).into());
 
     let context = glium::glutin::ContextBuilder::new()
-        .with_vsync(true)
+        //.with_vsync(true)
         .with_multisampling(4);
 
     let display = glium::Display::new(window, context, &events_loop).unwrap();
@@ -69,11 +69,13 @@ pub fn start_gui(rx: crossbeam_channel::Receiver<Result<B0xxState, ViewerError>>
 
     let mut renderer = Renderer::new(&display).unwrap();
 
+    let mut pending_events = Vec::new();
+
     //let mut event_loop = EventLoop::new();
     'main: loop {
         let mut maybe_state = match rx.recv().map_err(Into::into) {
             Ok(Ok(state)) => {
-                //debug!("{:#?}", state);
+                debug!("{:#?}", state);
                 Some(state)
             }
             Ok(Err(e)) | Err(e) => {
@@ -91,18 +93,12 @@ pub fn start_gui(rx: crossbeam_channel::Receiver<Result<B0xxState, ViewerError>>
         }
 
         // Collect all pending events.
-        let mut events = Vec::new();
-        events_loop.poll_events(|event| events.push(event));
+
+        events_loop.poll_events(|event| pending_events.push(event));
 
         // Handle all events.
-        for event in events.into_iter() {
-            // Use the `winit` backend feature to convert the winit event to a conrod one.
-            if let Some(event) = convert_event(event.clone(), &display) {
-                ui.handle_event(event);
-                //event_loop.needs_update();
-            }
-
-            match event {
+        for event in pending_events.drain(..) {
+            match &event {
                 glium::glutin::Event::WindowEvent { event, .. } => match event {
                     // Break from the loop upon `Escape`.
                     glium::glutin::WindowEvent::CloseRequested

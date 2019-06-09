@@ -20,9 +20,12 @@ pub fn start_serial_probe(
         .ok_or_else(|| ViewerError::B0xxNotFound)?;
 
     let port_settings = serialport::SerialPortSettings {
-        baud_rate: 115200,
-        timeout: std::time::Duration::from_secs(1),
-        ..Default::default()
+        baud_rate: 3_686_400,
+        data_bits: serialport::DataBits::Eight,
+        flow_control: serialport::FlowControl::None,
+        parity: serialport::Parity::None,
+        stop_bits: serialport::StopBits::One,
+        timeout: std::time::Duration::from_millis(500),
     };
 
     let (tx, rx) = crossbeam_channel::unbounded();
@@ -39,11 +42,9 @@ pub fn start_serial_probe(
         if let Err(e) = port.bytes().try_for_each(
             move |b: Result<u8, std::io::Error>| -> Result<(), ViewerError> {
                 let report: B0xxReport = b?.into();
-                //debug!("Report {:?}", report);
                 match report {
                     B0xxReport::End => {
                         let state: B0xxState = buf.as_slice().into();
-                        //info!("{:#?}", state);
                         let _ = loop_tx.send(Ok(state));
                         buf.clear();
                     }
