@@ -14,7 +14,9 @@ rand = { version = "0.6.5", optional = true }
 conrod_core = "0.65.0"
 conrod_winit = "0.65.0"
 conrod_glium = "0.65.0"
-glium = "0.25.0"
+glium = "0.23.0"
+winit = "0.18.1"
+crossbeam-channel = "0.3.8"
 
 [features]
 default = []

@@ -21,7 +21,7 @@ pub enum ViewerError {
     #[fail(display = "SerialPortError: {}", _0)]
     SerialPortError(serialport::Error),
     #[fail(display = "Internal serial thread error: {}", _0)]
-    SerialThreadError(std::sync::mpsc::RecvError),
+    SerialThreadError(crossbeam_channel::RecvError),
     #[fail(display = "An unknown error occured, sorry")]
     UnknownError,
 }
@@ -29,7 +29,7 @@ pub enum ViewerError {
 from_error!(serialport::Error, ViewerError, ViewerError::SerialPortError);
 from_error!(std::io::Error, ViewerError, ViewerError::IoError);
 from_error!(
-    std::sync::mpsc::RecvError,
+    crossbeam_channel::RecvError,
     ViewerError,
     ViewerError::SerialThreadError
 );
