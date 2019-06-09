@@ -2,7 +2,20 @@
 name = "b0xx-viewer-rs"
 version = "0.1.0"
 authors = ["Mathieu Amiot <amiot.mathieu@gmail.com>"]
+description = "GUI Viewer for B0XX controllers; particularly useful for streaming"
 edition = "2018"
+build = "build.rs"
+
+[package.metadata.winres]
+OriginalFilename = "b0xx_viewer.exe"
+LegalCopyright = "Copyright Mathieu \"@OtaK_\" Amiot © 2019"
+ProductName = "B0XX Viewer"
+
+
+
+[[bin]]
+name = "b0xx_viewer"
+path = "src/main.rs"
 
 [dependencies]
 serialport = "3.2.0"
@@ -17,6 +30,9 @@ conrod_glium = "0.65.0"
 glium = "0.23.0"
 winit = "0.18.1"
 crossbeam-channel = "0.3.8"
+
+[target.'cfg(windows)'.build-dependencies]
+winres = "0.1"
 
 [features]
 default = []
