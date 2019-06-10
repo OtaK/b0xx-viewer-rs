@@ -9,6 +9,15 @@ pub enum B0xxMessage {
     Quit,
 }
 
+#[inline]
+pub fn reconnect() -> crossbeam_channel::Receiver<B0xxMessage> {
+    loop {
+        if let Ok(new_rx) = start_serial_probe() {
+            return new_rx;
+        }
+    }
+}
+
 #[cfg(not(feature = "fake_serial"))]
 pub fn start_serial_probe() -> Result<crossbeam_channel::Receiver<B0xxMessage>, ViewerError> {
     use std::io::Read;
@@ -42,72 +51,76 @@ pub fn start_serial_probe() -> Result<crossbeam_channel::Receiver<B0xxMessage>, 
     };
 
     let (tx, rx) = crossbeam_channel::unbounded();
-    std::thread::spawn(move || {
-        let mut buf = Vec::with_capacity(18);
+    std::thread::Builder::new()
+        .name("b0xx_viewer_serial".into())
+        .spawn(move || {
+            let mut buf = Vec::with_capacity(18);
 
-        let mut port = match serialport::open_with_settings(&b0xx_port.port_name, &port_settings) {
-            Ok(port) => port,
-            Err(e) => return tx.send(B0xxMessage::Error(e.into())),
-        };
+            let mut port =
+                match serialport::open_with_settings(&b0xx_port.port_name, &port_settings) {
+                    Ok(port) => port,
+                    Err(e) => return tx.send(B0xxMessage::Error(e.into())),
+                };
 
-        match port.write_request_to_send(true) {
-            Err(e) => return tx.send(B0xxMessage::Error(e.into())),
-            _ => {}
-        }
+            match port.write_request_to_send(true) {
+                Err(e) => return tx.send(B0xxMessage::Error(e.into())),
+                _ => {}
+            }
 
-        let loop_tx = tx.clone();
-        let mut schedule_to_send = false;
+            let loop_tx = tx.clone();
+            let mut schedule_to_send = false;
 
-        if let Err(e) = port.bytes().try_for_each(
-            move |b: Result<u8, std::io::Error>| -> Result<(), ViewerError> {
-                use std::convert::TryInto as _;
+            if let Err(e) = port.bytes().try_for_each(
+                move |b: Result<u8, std::io::Error>| -> Result<(), ViewerError> {
+                    use std::convert::TryInto as _;
 
-                let report: B0xxReport = b?.into();
-                match report {
-                    B0xxReport::End => {
-                        if let Ok(state) = buf.as_slice().try_into() {
-                            let _ = loop_tx.send(B0xxMessage::State(state));
-                            buf.clear();
-                        } else {
-                            schedule_to_send = true;
-                        }
-                    }
-                    _ => {
-                        if buf.len() < buf.capacity() {
-                            buf.push(report);
-                        } else if schedule_to_send {
+                    let report: B0xxReport = b?.into();
+                    match report {
+                        B0xxReport::End => {
                             if let Ok(state) = buf.as_slice().try_into() {
-                                let _ = loop_tx.send(B0xxMessage::State(state));
+                                let _ = loop_tx.try_send(B0xxMessage::State(state));
+                                buf.clear();
+                            } else {
+                                schedule_to_send = true;
                             }
+                        }
+                        _ => {
+                            if buf.len() < buf.capacity() {
+                                buf.push(report);
+                            } else if schedule_to_send {
+                                if let Ok(state) = buf.as_slice().try_into() {
+                                    let _ = loop_tx.try_send(B0xxMessage::State(state));
+                                }
 
-                            buf.clear();
-                            buf.push(report);
-                            schedule_to_send = false;
+                                buf.clear();
+                                buf.push(report);
+                                schedule_to_send = false;
+                            }
                         }
                     }
-                }
 
-                Ok(())
-            },
-        ) {
-            if let ViewerError::IoError(io_error) = &e {
-                match io_error.kind() {
-                    std::io::ErrorKind::TimedOut => {
-                        return tx.send(B0xxMessage::Reconnect);
-                    }
+                    Ok(())
+                },
+            ) {
+                match &e {
+                    ViewerError::IoError(io_error) => match io_error.kind() {
+                        std::io::ErrorKind::TimedOut | std::io::ErrorKind::BrokenPipe => {
+                            return tx.send(B0xxMessage::Reconnect);
+                        }
+                        _ => {
+                            error!("{:?}", ViewerError::from(e));
+                            return tx.send(B0xxMessage::Quit);
+                        }
+                    },
                     _ => {
-                        error!("{}", ViewerError::from(e));
+                        error!("{:?}", ViewerError::from(e));
                         return tx.send(B0xxMessage::Quit);
                     }
                 }
-            } else {
-                error!("{}", ViewerError::from(e));
-                return tx.send(B0xxMessage::Quit);
             }
-        }
 
-        Ok(())
-    });
+            Ok(())
+        })?;
 
     Ok(rx)
 }

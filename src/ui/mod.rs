@@ -3,7 +3,7 @@ mod gui;
 mod support;
 
 use self::support::*;
-use crate::error::ViewerError;
+
 use crate::serial_probe::*;
 
 use conrod_core::widget_ids;
@@ -70,37 +70,29 @@ pub fn start_gui(mut rx: crossbeam_channel::Receiver<B0xxMessage>) {
     let mut pending_events = Vec::new();
 
     'main: loop {
-        let mut maybe_state = match rx.recv().map_err(ViewerError::from) {
-            Ok(message) => match message {
+        let mut maybe_state = match rx.try_iter().last() {
+            Some(message) => match message {
                 B0xxMessage::State(state) => {
                     debug!("{:#?}", state);
                     Some(state)
                 }
                 B0xxMessage::Error(e) => {
                     error!("{}", e);
+                    drop(rx);
+                    rx = reconnect();
                     None
                 }
                 B0xxMessage::Quit => {
                     break 'main;
                 }
                 B0xxMessage::Reconnect => {
-                    loop {
-                        match start_serial_probe() {
-                            Ok(new_rx) => {
-                                rx = new_rx;
-                                break;
-                            }
-                            Err(_) => {}
-                        }
-                    }
+                    drop(rx);
+                    rx = reconnect();
 
                     None
                 }
             },
-            Err(e) => {
-                error!("{}", e);
-                break 'main;
-            }
+            None => None,
         };
 
         if let Some(new_state) = maybe_state.take() {
@@ -111,7 +103,6 @@ pub fn start_gui(mut rx: crossbeam_channel::Receiver<B0xxMessage>) {
         }
 
         // Collect all pending events.
-
         events_loop.poll_events(|event| pending_events.push(event));
 
         // Handle all events.
