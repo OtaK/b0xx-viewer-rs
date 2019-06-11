@@ -19,6 +19,7 @@ lazy_static! {
     pub static ref DEFAULT_INACTIVE_COLOR: Color = conrod_core::color::CHARCOAL;
     pub static ref DEFAULT_BACKGROUND_COLOR: Color = conrod_core::color::rgb_bytes(19, 19, 19);
 }
+
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub struct ViewerButtonColors {
     pub start: Color,
@@ -68,6 +69,7 @@ impl ViewerButtonColors {
 
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub struct ViewerOptions {
+    pub display_labels: bool,
     pub background_color: Color,
     pub button_inactive_colors: ViewerButtonColors,
     pub button_active_colors: ViewerButtonColors,
@@ -76,6 +78,7 @@ pub struct ViewerOptions {
 impl Default for ViewerOptions {
     fn default() -> Self {
         Self {
+            display_labels: false,
             background_color: *DEFAULT_BACKGROUND_COLOR,
             button_inactive_colors: ViewerButtonColors::new_with_color(*DEFAULT_INACTIVE_COLOR),
             button_active_colors: ViewerButtonColors::new_with_color(*DEFAULT_ACTIVE_COLOR),
@@ -88,6 +91,7 @@ pub fn cli_options() -> ViewerOptions {
         (version: crate_version!())
         (author: crate_authors!())
         (about: crate_description!())
+        (@arg labels: -l --labels "Enable button labels")
         (@arg bg_color: -b --background +takes_value "Sets a custom background color")
         (@arg btn_inactive_color: -i --inactive +takes_value "Sets a custom color for inactive buttons")
         (@arg btn_active_color: -a --active +takes_value "Sets a custom color for pressed/active buttons")
@@ -95,6 +99,10 @@ pub fn cli_options() -> ViewerOptions {
     .get_matches();
 
     let mut ret = ViewerOptions::default();
+
+    if matches.is_present("labels") {
+        ret.display_labels = true;
+    }
 
     if let Some(Ok(bg)) = matches
         .value_of("bg_color")

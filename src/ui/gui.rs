@@ -201,6 +201,23 @@ pub fn render_gui(
     )
     .x_y_relative_to(ids.c_left_btn, 0., -48.)
     .set(ids.c_down_btn, ui);
+
+    fps_counter(ui, ids, app);
+}
+
+#[cfg(not(feature = "fps"))]
+fn fps_counter(_: &mut conrod_core::UiCell, _: &Ids, _: &mut ViewerApp) {}
+
+#[cfg(feature = "fps")]
+fn fps_counter(ui: &mut conrod_core::UiCell, ids: &Ids, app: &mut ViewerApp) {
+    use conrod_core::{color, widget, Colorable, Positionable, Widget};
+
+    let fps = app.fps.tick();
+    widget::Text::new(&fps.to_string())
+        .color(color::YELLOW)
+        .top_right_with_margin_on(ids.frame, 10.)
+        .floating(true)
+        .set(ids.fps_counter, ui);
 }
 
 #[inline(always)]
@@ -212,8 +229,12 @@ fn make_button(
 ) -> conrod_core::widget::Oval<conrod_core::widget::primitive::shape::oval::Full> {
     use conrod_core::{widget, Colorable, Sizeable, Widget};
 
+    let color = if state { active_color } else { inactive_color };
+
+    // TODO: Create label in black/white depending on button color and put it in the button
+
     widget::Circle::fill(BTN_RADIUS)
-        .color(if state { active_color } else { inactive_color })
+        .color(color)
         .parent(parent)
         .graphics_for(parent)
         .w_h(BTN_RADIUS, BTN_RADIUS)

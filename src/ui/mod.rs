@@ -11,6 +11,8 @@ use conrod_core::widget_ids;
 use conrod_glium::Renderer;
 use glium::Surface;
 
+const NOTO_FONT: &[u8] = include_bytes!("../../assets/fonts/NotoSans-Regular.ttf");
+
 use conrod_winit::{
     convert_event, convert_key, convert_mouse_button, convert_mouse_cursor, convert_window_event,
 };
@@ -38,6 +40,25 @@ widget_ids! {
         c_right_btn,
         c_up_btn,
         c_down_btn,
+        start_label,
+        y_label,
+        x_label,
+        b_label,
+        a_label,
+        l_label,
+        r_label,
+        z_label,
+        up_label,
+        down_label,
+        right_label,
+        left_label,
+        mod_x_label,
+        mod_y_label,
+        c_left_label,
+        c_right_label,
+        c_up_label,
+        c_down_label,
+        fps_counter,
     }
 }
 
@@ -53,6 +74,11 @@ pub fn start_gui(mut rx: crossbeam_channel::Receiver<B0xxMessage>, options: View
 
     let context = glium::glutin::ContextBuilder::new()
         .with_vsync(true)
+        .with_gl_robustness(if cfg!(profile = "release") {
+            glium::glutin::Robustness::NoError
+        } else {
+            glium::glutin::Robustness::TryRobustLoseContextOnReset
+        })
         .with_multisampling(4);
 
     let display = glium::Display::new(window, context, &events_loop).unwrap();
@@ -62,6 +88,12 @@ pub fn start_gui(mut rx: crossbeam_channel::Receiver<B0xxMessage>, options: View
     let mut ui = conrod_core::UiBuilder::new([WIN_W as f64, WIN_H as f64])
         .theme(gui::theme())
         .build();
+
+    let noto_font = ui
+        .fonts
+        .insert(rusttype::Font::from_bytes(NOTO_FONT).unwrap());
+
+    ui.theme.font_id = Some(noto_font);
 
     let ids = Ids::new(ui.widget_id_generator());
 
@@ -136,10 +168,10 @@ pub fn start_gui(mut rx: crossbeam_channel::Receiver<B0xxMessage>, options: View
         // Draw the `Ui`.
         if let Some(primitives) = ui.draw_if_changed() {
             renderer.fill(&display.0, primitives, &image_map);
-            let mut target = display.0.draw();
-            target.clear_color(0.0, 0.0, 0.0, 1.0);
-            renderer.draw(&display.0, &mut target, &image_map).unwrap();
-            target.finish().unwrap();
+            let mut frame = display.0.draw();
+            frame.clear_color(0.0, 0.0, 0.0, 1.0);
+            renderer.draw(&display.0, &mut frame, &image_map).unwrap();
+            frame.finish().unwrap();
         }
     }
 }

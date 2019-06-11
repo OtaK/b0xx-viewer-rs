@@ -1,8 +1,27 @@
 use crate::b0xx_state::B0xxState;
 
-#[derive(Debug, Default, Clone)]
 pub struct ViewerApp {
     pub state: B0xxState,
+    #[cfg(feature = "fps")]
+    pub fps: fps_counter::FPSCounter,
+}
+
+impl std::fmt::Debug for ViewerApp {
+    fn fmt(&self, fmt: &mut std::fmt::Formatter) -> std::fmt::Result {
+        fmt.debug_struct("ViewerApp")
+            .field("state", &self.state)
+            .finish()
+    }
+}
+
+impl Default for ViewerApp {
+    fn default() -> Self {
+        Self {
+            state: B0xxState::default(),
+            #[cfg(feature = "fps")]
+            fps: fps_counter::FPSCounter::new(),
+        }
+    }
 }
 
 impl ViewerApp {
