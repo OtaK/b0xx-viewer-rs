@@ -30,6 +30,8 @@ conrod_glium = "0.65.0"
 glium = "0.23.0"
 winit = "0.18.1"
 crossbeam-channel = "0.3.8"
+clap = "2.33.0"
+lazy_static = "1.3.0"
 
 [target.'cfg(windows)'.build-dependencies]
 winres = "0.1"

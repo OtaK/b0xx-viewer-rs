@@ -3,12 +3,17 @@ mod gui;
 mod support;
 
 use self::support::*;
+use crate::cli::ViewerOptions;
 
 use crate::serial_probe::*;
 
 use conrod_core::widget_ids;
 use conrod_glium::Renderer;
 use glium::Surface;
+
+use conrod_winit::{
+    convert_event, convert_key, convert_mouse_button, convert_mouse_cursor, convert_window_event,
+};
 
 conrod_winit::conversion_fns!();
 
@@ -36,7 +41,7 @@ widget_ids! {
     }
 }
 
-pub fn start_gui(mut rx: crossbeam_channel::Receiver<B0xxMessage>) {
+pub fn start_gui(mut rx: crossbeam_channel::Receiver<B0xxMessage>, options: ViewerOptions) {
     // Build the window.
     let mut events_loop = glium::glutin::EventsLoop::new();
 
@@ -126,7 +131,7 @@ pub fn start_gui(mut rx: crossbeam_channel::Receiver<B0xxMessage>) {
         }
 
         // Instantiate a GUI demonstrating every widget type provided by conrod.
-        gui::render_gui(&mut ui.set_widgets(), &ids, &mut app);
+        gui::render_gui(&mut ui.set_widgets(), &ids, &mut app, options);
 
         // Draw the `Ui`.
         if let Some(primitives) = ui.draw_if_changed() {
