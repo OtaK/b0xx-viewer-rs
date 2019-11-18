@@ -50,6 +50,8 @@ pub fn start_serial_probe() -> Result<crossbeam_channel::Receiver<B0xxMessage>, 
         timeout: std::time::Duration::from_millis(500),
     };
 
+    let wait = std::time::Duration::from_micros(8200);
+
     let (tx, rx) = crossbeam_channel::unbounded();
     std::thread::Builder::new()
         .name("b0xx_viewer_serial".into())
@@ -84,6 +86,7 @@ pub fn start_serial_probe() -> Result<crossbeam_channel::Receiver<B0xxMessage>, 
                                 schedule_to_send = true;
                             }
                         }
+                        B0xxReport::Invalid => {}
                         _ => {
                             if buf.len() < buf.capacity() {
                                 buf.push(report);
@@ -98,6 +101,8 @@ pub fn start_serial_probe() -> Result<crossbeam_channel::Receiver<B0xxMessage>, 
                             }
                         }
                     }
+
+                    std::thread::sleep(wait);
 
                     Ok(())
                 },

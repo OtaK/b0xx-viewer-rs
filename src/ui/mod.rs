@@ -3,7 +3,7 @@ mod gui;
 mod support;
 
 use self::support::*;
-use crate::cli::ViewerOptions;
+use crate::config::ViewerOptions;
 
 use crate::serial_probe::*;
 
@@ -164,13 +164,13 @@ pub fn start_gui(mut rx: crossbeam_channel::Receiver<B0xxMessage>, options: View
         }
 
         // Instantiate a GUI demonstrating every widget type provided by conrod.
-        gui::render_gui(&mut ui.set_widgets(), &ids, &mut app, options);
+        gui::render_gui(&mut ui.set_widgets(), &ids, &mut app, &options);
 
         // Draw the `Ui`.
         if let Some(primitives) = ui.draw_if_changed() {
             renderer.fill(&display.0, primitives, &image_map);
             let mut frame = display.0.draw();
-            frame.clear_color(0.0, 0.0, 0.0, 1.0);
+            frame.clear_color(0., 0., 0., 1.);
             renderer.draw(&display.0, &mut frame, &image_map).unwrap();
             frame.finish().unwrap();
         }

@@ -32,6 +32,9 @@ clap = "2.33.0"
 lazy_static = "1.4.0"
 fps_counter = {version = "1.0.0", optional = true }
 rusttype = "^0.7.9"
+serde = { version = "1.0.102", features = ["derive"] }
+toml = "0.5.5"
+rgb = { version = "0.8.14", features = ["serde"] }
 
 [target.'cfg(windows)'.build-dependencies]
 winres = "0.1"
