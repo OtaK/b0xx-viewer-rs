@@ -68,7 +68,7 @@ pub fn start_gui(mut rx: crossbeam_channel::Receiver<B0xxMessage>, options: View
     let mut events_loop = glium::glutin::EventsLoop::new();
 
     let window = glium::glutin::WindowBuilder::new()
-        //.with_decorations(false)
+        .with_decorations(!options.chromeless)
         .with_title(WIN_TITLE)
         .with_resizable(false)
         .with_dimensions((WIN_W, WIN_H).into());
