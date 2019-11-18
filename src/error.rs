@@ -22,6 +22,8 @@ pub enum ViewerError {
     SerialPortError(serialport::Error),
     #[fail(display = "Internal serial thread error: {}", _0)]
     SerialThreadError(crossbeam_channel::RecvError),
+    #[fail(display = "Configuration error: {}", _0)]
+    ConfigError(crate::config::ConfigError),
     #[fail(display = "The state report transmitted over serial was malformed")]
     MalformedSerialReport,
     #[fail(display = "An unknown error occured, sorry")]
@@ -34,4 +36,9 @@ from_error!(
     crossbeam_channel::RecvError,
     ViewerError,
     ViewerError::SerialThreadError
+);
+from_error!(
+    crate::config::ConfigError,
+    ViewerError,
+    ViewerError::ConfigError
 );
