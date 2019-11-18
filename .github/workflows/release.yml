@@ -1,0 +1,38 @@
+on:
+  release:
+    types: [created]
+
+name: Handle Release
+jobs:
+  generate:
+    name: Create release-artifacts
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-latest, windows-latest, ubuntu-latest]
+    steps:
+      - name: Checkout the repository
+        uses: actions/checkout@v1
+      - name: Dependencies (Linux)
+        if: matrix.os == 'ubuntu-latest'
+        run: sudo apt-get install -y libudev-dev libxcb-shape0-dev libxcb-xfixes0-dev
+      - name: Install minimal stable Rust
+        uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: stable
+      - name: Run build
+        uses: actions-rs/cargo@v1
+        with:
+          command: build
+          args: --release
+      - name: Rename artifacts
+        shell: bash
+        run: mv target/b0xx_viewer b0xx_viewer_${{ matrix.os }}
+      - name: Upload the artifacts
+        uses: skx/github-action-publish-binaries@release-1.3
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          args: 'b0xx_viewer_*'
