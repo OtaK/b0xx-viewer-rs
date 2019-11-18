@@ -13,6 +13,7 @@ use glium::Surface;
 
 const NOTO_FONT: &[u8] = include_bytes!("../../assets/fonts/NotoSans-Regular.ttf");
 
+#[allow(unused_imports)]
 use conrod_winit::{
     convert_event, convert_key, convert_mouse_button, convert_mouse_cursor, convert_window_event,
 };
