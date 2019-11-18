@@ -1,0 +1,38 @@
+name: Rust
+
+on: [push]
+
+jobs:
+  build:
+
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-latest, windows-latest, ubuntu-latest]
+
+    steps:
+    - uses: actions/checkout@v1
+    - name: Dependencies (Linux)
+      if: matrix.os == 'ubuntu-latest'
+      run: sudo apt-get install -y libudev-dev libuv1-dev
+    - name: Install minimal stable with clippy and rustfmt
+      uses: actions-rs/toolchain@v1
+      with:
+        profile: minimal
+        toolchain: stable
+        components: rustfmt, clippy
+    - name: Run cargo check
+      uses: actions-rs/cargo@v1
+      with:
+        command: check
+    - name: Run build
+      uses: actions-rs/cargo@v1
+      with:
+        command: build
+        args: --verbose
+    - name: Run tests
+      uses: actions-rs/cargo@v1
+      with:
+        command: test
+        args: --verbose
