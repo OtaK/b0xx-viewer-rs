@@ -133,7 +133,7 @@ pub fn start_serial_probe() -> Result<crossbeam_channel::Receiver<B0xxMessage>, 
 #[cfg(feature = "fake_serial")]
 pub fn start_serial_probe() -> Result<crossbeam_channel::Receiver<B0xxMessage>, ViewerError> {
     let (tx, rx) = crossbeam_channel::unbounded();
-    let wait = std::time::Duration::from_micros(16667);
+    let wait = std::time::Duration::from_micros(8200);
     std::thread::spawn(move || loop {
         let _ = tx.send(B0xxMessage::State(B0xxState::random()));
         std::thread::sleep(wait);

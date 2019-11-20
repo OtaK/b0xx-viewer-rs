@@ -61,6 +61,13 @@ impl Into<Color> for ViewerColor {
     }
 }
 
+impl std::ops::Deref for ViewerColor {
+    type Target = rgb::RGB8;
+    fn deref(&self) -> &Self::Target {
+        &self.0
+    }
+}
+
 #[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq)]
 pub struct ViewerButtonColors {
     pub start: ViewerColor,
