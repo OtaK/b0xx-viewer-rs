@@ -11,9 +11,9 @@ pub fn cli_options() -> ViewerOptions {
         (@arg bg_color: -b --background +takes_value "Sets a custom background color")
         (@arg btn_inactive_color: -i --inactive +takes_value "Sets a custom color for inactive buttons")
         (@arg btn_active_color: -a --active +takes_value "Sets a custom color for pressed/active buttons")
-        (@arg init_config: -ic --init-config "Intializes an empty configuration in the executable's folder")
+        (@arg init_config: --init_config "Intializes an empty configuration in the executable's folder")
         (@arg config: -c --config "Sets the configuration file path")
-        (@arg chromeless: -cl --chromeless "Makes the window chromeless")
+        (@arg chromeless: --chromeless "Makes the window chromeless")
     )
     .get_matches();
 
@@ -23,7 +23,7 @@ pub fn cli_options() -> ViewerOptions {
         return ret;
     }
 
-    let mut ret = if let Some(config_path) = matches.value_of("config") {
+    let mut ret = if let Some(config_path) = matches.value_of("config").take() {
         ViewerOptions::load(config_path.into()).unwrap_or_default()
     } else {
         ViewerOptions::load_cwd().unwrap_or_default()
@@ -39,6 +39,7 @@ pub fn cli_options() -> ViewerOptions {
 
     if let Some(Ok(bg)) = matches
         .value_of("bg_color")
+        .take()
         .map(|s| u32::from_str_radix(s.trim_start_matches('#'), 16))
     {
         ret.background_color = hex_to_color!(bg);
@@ -46,6 +47,7 @@ pub fn cli_options() -> ViewerOptions {
 
     if let Some(Ok(bg)) = matches
         .value_of("btn_inactive_color")
+        .take()
         .map(|s| u32::from_str_radix(s.trim_start_matches('#'), 16))
     {
         ret.button_inactive_colors = ViewerButtonColors::new_with_color(hex_to_color!(bg));
@@ -53,6 +55,7 @@ pub fn cli_options() -> ViewerOptions {
 
     if let Some(Ok(bg)) = matches
         .value_of("btn_active_color")
+        .take()
         .map(|s| u32::from_str_radix(s.trim_start_matches('#'), 16))
     {
         ret.button_active_colors = ViewerButtonColors::new_with_color(hex_to_color!(bg));
