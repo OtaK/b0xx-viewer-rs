@@ -54,7 +54,7 @@ pub fn render_gui(
 
 
     if let Some(text_color) = m_text.take() {
-        conrod_core::widget::Text::new("Start")
+        conrod_core::widget::Text::new("SRT")
             .color(text_color)
             .middle_of(ids.start_btn)
             .set(ids.start_label, ui);
