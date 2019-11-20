@@ -11,7 +11,7 @@ use conrod_core::widget_ids;
 use conrod_glium::Renderer;
 use glium::Surface;
 
-const NOTO_FONT: &[u8] = include_bytes!("../../assets/fonts/NotoSans-Regular.ttf");
+const ALATA_FONT: &[u8] = include_bytes!("../../assets/fonts/Alata-Regular.ttf");
 
 #[allow(unused_imports)]
 use conrod_winit::{
@@ -90,11 +90,11 @@ pub fn start_gui(mut rx: crossbeam_channel::Receiver<B0xxMessage>, options: View
         .theme(gui::theme())
         .build();
 
-    let noto_font = ui
+    let alata_font = ui
         .fonts
-        .insert(rusttype::Font::from_bytes(NOTO_FONT).unwrap());
+        .insert(rusttype::Font::from_bytes(ALATA_FONT).unwrap());
 
-    ui.theme.font_id = Some(noto_font);
+    ui.theme.font_id = Some(alata_font);
 
     let ids = Ids::new(ui.widget_id_generator());
 
