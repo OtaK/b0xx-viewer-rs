@@ -1,6 +1,7 @@
 use crate::b0xx_state::*;
 use crate::error::ViewerError;
 
+#[cfg_attr(feature = "fake_serial", allow(dead_code))]
 #[derive(Debug)]
 pub enum B0xxMessage {
     State(B0xxState),
