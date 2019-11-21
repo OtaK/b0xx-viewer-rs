@@ -14,6 +14,7 @@ pub fn cli_options() -> ViewerOptions {
         (@arg init_config: --init_config "Intializes an empty configuration in the executable's folder")
         (@arg config: -c --config +takes_value "Sets the configuration file path")
         (@arg chromeless: --chromeless "Makes the window chromeless")
+        (@arg tty: --tty +takes_value "Provide a custom COM port (Windows-only) or a /dev/ttyXXX path (Unix). Bypasses auto-detection")
     )
     .get_matches();
 
@@ -36,6 +37,21 @@ pub fn cli_options() -> ViewerOptions {
 
     if matches.is_present("chromeless") {
         ret.chromeless = true;
+    }
+
+    if let Some(tty) = matches.value_of("tty").take() {
+        if let Ok(ports) = serialport::available_ports() {
+            ret.custom_tty = ports
+                .into_iter()
+                .find(|p| p.port_name == tty)
+                .map(move |_| String::from(tty));
+
+            if ret.custom_tty.is_none() {
+                error!("Provided port not found or not connected to system");
+            }
+        } else {
+            error!("No ports available on the system, cannot lookup");
+        }
     }
 
     if let Some(Ok(bg)) = matches

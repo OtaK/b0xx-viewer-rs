@@ -122,6 +122,7 @@ pub struct ViewerOptions {
     pub background_color: ViewerColor,
     pub button_inactive_colors: ViewerButtonColors,
     pub button_active_colors: ViewerButtonColors,
+    pub custom_tty: Option<String>,
     #[serde(skip)]
     path: std::path::PathBuf,
 }
@@ -134,6 +135,7 @@ impl Default for ViewerOptions {
             background_color: *DEFAULT_BACKGROUND_COLOR,
             button_inactive_colors: ViewerButtonColors::new_with_color(*DEFAULT_INACTIVE_COLOR),
             button_active_colors: ViewerButtonColors::new_with_color(*DEFAULT_ACTIVE_COLOR),
+            custom_tty: None,
             path: Default::default(),
         }
     }
@@ -160,7 +162,8 @@ impl ViewerOptions {
     }
 
     pub fn save_to(&mut self, path: std::path::PathBuf) -> Result<(), ViewerError> {
-        let buf = toml::ser::to_vec(self).map_err(|e| ViewerError::from(ConfigError::SerializationError(e)))?;
+        let buf = toml::ser::to_vec(self)
+            .map_err(|e| ViewerError::from(ConfigError::SerializationError(e)))?;
         let _ = std::fs::write(path.clone(), buf)?;
         self.path = path;
         Ok(())
