@@ -12,7 +12,7 @@ pub fn cli_options() -> ViewerOptions {
         (@arg btn_inactive_color: -i --inactive +takes_value "Sets a custom color for inactive buttons")
         (@arg btn_active_color: -a --active +takes_value "Sets a custom color for pressed/active buttons")
         (@arg init_config: --init_config "Intializes an empty configuration in the executable's folder")
-        (@arg config: -c --config "Sets the configuration file path")
+        (@arg config: -c --config +takes_value "Sets the configuration file path")
         (@arg chromeless: --chromeless "Makes the window chromeless")
     )
     .get_matches();
