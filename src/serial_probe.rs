@@ -31,7 +31,9 @@ pub fn start_serial_probe(custom_tty: &Option<String>) -> Result<crossbeam_chann
                     return true;
                 }
             } else if let serialport::SerialPortType::UsbPort(portinfo) = &port.port_type {
-                if portinfo.vid == 9025 && portinfo.pid == 32822 {
+                if portinfo.vid == 9025
+                    && (std::env::var("RELAX_ARDUINO_DETECT").is_ok() || portinfo.pid == 32822)
+                {
                     return true;
                 }
 
