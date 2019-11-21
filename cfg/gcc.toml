@@ -1,0 +1,187 @@
+display_labels = true
+chromeless = false
+
+[background_color]
+r = 19
+g = 19
+b = 19
+
+[button_inactive_colors.start]
+r = 205
+g = 205
+b = 205
+
+[button_inactive_colors.y]
+r = 205
+g = 205
+b = 205
+
+[button_inactive_colors.x]
+r = 205
+g = 205
+b = 205
+
+[button_inactive_colors.b]
+r = 231
+g = 49
+b = 72
+
+[button_inactive_colors.a]
+r = 41
+g = 169
+b = 161
+
+[button_inactive_colors.l]
+r = 205
+g = 205
+b = 205
+
+[button_inactive_colors.r]
+r = 205
+g = 205
+b = 205
+
+[button_inactive_colors.z]
+r = 57
+g = 40
+b = 120
+
+[button_inactive_colors.up]
+r = 85
+g = 87
+b = 83
+
+[button_inactive_colors.down]
+r = 85
+g = 87
+b = 83
+
+[button_inactive_colors.right]
+r = 85
+g = 87
+b = 83
+
+[button_inactive_colors.left]
+r = 85
+g = 87
+b = 83
+
+[button_inactive_colors.mod_x]
+r = 85
+g = 87
+b = 83
+
+[button_inactive_colors.mod_y]
+r = 85
+g = 87
+b = 83
+
+[button_inactive_colors.c_left]
+r = 221
+g = 203
+b = 59
+
+[button_inactive_colors.c_right]
+r = 221
+g = 203
+b = 59
+
+[button_inactive_colors.c_up]
+r = 221
+g = 203
+b = 59
+
+[button_inactive_colors.c_down]
+r = 221
+g = 203
+b = 59
+
+[button_active_colors.start]
+r = 240
+g = 240
+b = 240
+
+[button_active_colors.y]
+r = 240
+g = 240
+b = 240
+
+[button_active_colors.x]
+r = 240
+g = 240
+b = 240
+
+[button_active_colors.b]
+r = 255
+g = 49
+b = 72
+
+[button_active_colors.a]
+r = 41
+g = 199
+b = 190
+
+[button_active_colors.l]
+r = 240
+g = 240
+b = 240
+
+[button_active_colors.r]
+r = 240
+g = 240
+b = 240
+
+[button_active_colors.z]
+r = 79
+g = 61
+b = 139
+
+[button_active_colors.up]
+r = 240
+g = 240
+b = 240
+
+[button_active_colors.down]
+r = 240
+g = 240
+b = 240
+
+[button_active_colors.right]
+r = 240
+g = 240
+b = 240
+
+[button_active_colors.left]
+r = 240
+g = 240
+b = 240
+
+[button_active_colors.mod_x]
+r = 0
+g = 235
+b = 255
+
+[button_active_colors.mod_y]
+r = 0
+g = 235
+b = 255
+
+[button_active_colors.c_left]
+r = 255
+g = 234
+b = 66
+
+[button_active_colors.c_right]
+r = 255
+g = 234
+b = 66
+
+[button_active_colors.c_up]
+r = 255
+g = 234
+b = 66
+
+[button_active_colors.c_down]
+r = 255
+g = 234
+b = 66
