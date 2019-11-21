@@ -20,7 +20,8 @@ pub fn cli_options() -> ViewerOptions {
     if matches.is_present("init_config") {
         let mut ret = ViewerOptions::default();
         let _ = ret.save_cwd().unwrap();
-        return ret;
+        info!("configuration saved in ./b0xx_viewer_config.toml");
+        std::process::exit(0);
     }
 
     let mut ret = if let Some(config_path) = matches.value_of("config").take() {
