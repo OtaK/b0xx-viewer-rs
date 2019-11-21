@@ -15,6 +15,7 @@ pub fn cli_options() -> ViewerOptions {
         (@arg config: -c --config +takes_value "Sets the configuration file path")
         (@arg chromeless: --chromeless "Makes the window chromeless")
         (@arg tty: --tty +takes_value "Provide a custom COM port (Windows-only) or a /dev/ttyXXX path (Unix). Bypasses auto-detection")
+        (@arg relax_arduino: --relax_arduino_detection "Relaxes B0XX detection to allow any Arduino device to connect")
     )
     .get_matches();
 
@@ -23,6 +24,10 @@ pub fn cli_options() -> ViewerOptions {
         let _ = ret.save_cwd().unwrap();
         info!("configuration saved in ./b0xx_viewer_config.toml");
         std::process::exit(0);
+    }
+
+    if matches.is_present("relax_arduino") {
+        std::env::set_var("RELAX_ARDUINO_DETECT", "true");
     }
 
     let mut ret = if let Some(config_path) = matches.value_of("config").take() {
