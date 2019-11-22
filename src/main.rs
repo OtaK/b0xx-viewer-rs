@@ -18,7 +18,7 @@ pub fn main() {
 
     let options = cli::cli_options();
 
-    let rx = match serial_probe::start_serial_probe() {
+    let rx = match serial_probe::start_serial_probe(&options.custom_tty) {
         Ok(rx) => rx,
         Err(e) => {
             error!("{}", e);

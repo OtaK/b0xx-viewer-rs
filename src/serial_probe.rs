@@ -11,22 +11,26 @@ pub enum B0xxMessage {
 }
 
 #[inline]
-pub fn reconnect() -> crossbeam_channel::Receiver<B0xxMessage> {
+pub fn reconnect(custom_tty: &Option<String>) -> crossbeam_channel::Receiver<B0xxMessage> {
     loop {
-        if let Ok(new_rx) = start_serial_probe() {
+        if let Ok(new_rx) = start_serial_probe(custom_tty) {
             return new_rx;
         }
     }
 }
 
 #[cfg(not(feature = "fake_serial"))]
-pub fn start_serial_probe() -> Result<crossbeam_channel::Receiver<B0xxMessage>, ViewerError> {
+pub fn start_serial_probe(custom_tty: &Option<String>) -> Result<crossbeam_channel::Receiver<B0xxMessage>, ViewerError> {
     use std::io::Read;
 
     let b0xx_port = serialport::available_ports()?
         .into_iter()
-        .find(|port| {
-            if let serialport::SerialPortType::UsbPort(portinfo) = &port.port_type {
+        .find(move |port| {
+            if let Some(custom_tty) = custom_tty {
+                if port.port_name == *custom_tty {
+                    return true;
+                }
+            } else if let serialport::SerialPortType::UsbPort(portinfo) = &port.port_type {
                 if portinfo.vid == 9025 && portinfo.pid == 32822 {
                     return true;
                 }
@@ -132,7 +136,7 @@ pub fn start_serial_probe() -> Result<crossbeam_channel::Receiver<B0xxMessage>, 
 }
 
 #[cfg(feature = "fake_serial")]
-pub fn start_serial_probe() -> Result<crossbeam_channel::Receiver<B0xxMessage>, ViewerError> {
+pub fn start_serial_probe(_: Option<String>) -> Result<crossbeam_channel::Receiver<B0xxMessage>, ViewerError> {
     let (tx, rx) = crossbeam_channel::unbounded();
     let wait = std::time::Duration::from_micros(8200);
     std::thread::spawn(move || loop {
