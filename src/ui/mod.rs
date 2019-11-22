@@ -117,7 +117,7 @@ pub fn start_gui(mut rx: crossbeam_channel::Receiver<B0xxMessage>, options: View
                 B0xxMessage::Error(e) => {
                     error!("{}", e);
                     drop(rx);
-                    rx = reconnect();
+                    rx = reconnect(&options.custom_tty);
                     None
                 }
                 B0xxMessage::Quit => {
@@ -125,7 +125,7 @@ pub fn start_gui(mut rx: crossbeam_channel::Receiver<B0xxMessage>, options: View
                 }
                 B0xxMessage::Reconnect => {
                     drop(rx);
-                    rx = reconnect();
+                    rx = reconnect(&options.custom_tty);
 
                     None
                 }
