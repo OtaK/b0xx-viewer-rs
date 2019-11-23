@@ -43,6 +43,7 @@ winres = "0.1"
 default = []
 fake_serial = ["rand"]
 fps = ["fps_counter"]
+win_console = []
 
 [profile.release]
 lto = true
