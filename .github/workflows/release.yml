@@ -1,8 +1,9 @@
+name: Handle Release
+
 on:
   release:
     types: [created]
 
-name: Handle Release
 jobs:
   generate:
     name: Create release-artifacts
@@ -12,8 +13,7 @@ jobs:
       matrix:
         os: [macos-latest, windows-latest, ubuntu-latest]
     steps:
-      - name: Checkout the repository
-        uses: actions/checkout@v1
+      - uses: actions/checkout@v1
       - name: Dependencies (Linux)
         if: matrix.os == 'ubuntu-latest'
         run: sudo apt-get install -y libudev-dev libxcb-shape0-dev libxcb-xfixes0-dev
@@ -27,12 +27,26 @@ jobs:
         with:
           command: build
           args: --release
-      - name: Rename artifacts
-        shell: bash
-        run: mv target/b0xx_viewer b0xx_viewer_${{ matrix.os }}
+      - name: Run tests
+        uses: actions-rs/cargo@v1
+        with:
+          command: test
+          args: --release
+      - name: Create artifact archive (Linux)
+        if: matrix.os == 'ubuntu-latest'
+        run: |
+          zip -r b0xx_viewer_linux_release_${{ github.event.release.tag_name }}.zip assets target/release/b0xx_viewer
+      - name: Create artifact archive (macOS)
+        if: matrix.os == 'macos-latest'
+        run: |
+          zip -r b0xx_viewer_macos_release_${{ github.event.release.tag_name }}.zip assets target/release/b0xx_viewer
+      - name: Create artifact archive (Windows)
+        if: matrix.os == 'windows-latest'
+        run: |
+          zip -r b0xx_viewer_windows_release_${{ github.event.release.tag_name }}.zip assets target/release/b0xx_viewer.exe
       - name: Upload the artifacts
         uses: skx/github-action-publish-binaries@release-1.3
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          args: 'b0xx_viewer_*'
+          args: 'b0xx_viewer_*_release_${{ github.event.release.tag_name }}.zip'
