@@ -87,6 +87,8 @@ pub fn start_serial_probe(custom_tty: &Option<String>) -> Result<crossbeam_chann
         })
         .ok_or_else(|| ViewerError::B0xxNotFound)?;
 
+    info!("Found B0XX on port {}", b0xx_port.port_name);
+
     let port_settings = serialport::SerialPortSettings {
         baud_rate: 115_200,
         data_bits: serialport::DataBits::Eight,
@@ -96,7 +98,8 @@ pub fn start_serial_probe(custom_tty: &Option<String>) -> Result<crossbeam_chann
         timeout: std::time::Duration::from_millis(500),
     };
 
-    let wait = std::time::Duration::from_micros(8200);
+    // TODO: Refactor the read loop to use RTS/CTS with a 120Hz max sleep in the middle
+    let _wait = std::time::Duration::from_micros(8200);
 
     let (tx, rx) = crossbeam_channel::unbounded();
     std::thread::Builder::new()
@@ -117,6 +120,7 @@ pub fn start_serial_probe(custom_tty: &Option<String>) -> Result<crossbeam_chann
 
             let loop_tx = tx.clone();
             let mut schedule_to_send = false;
+            //let mut time = std::time::Instant::now();
 
             if let Err(e) = port.bytes().try_for_each(
                 move |b: Result<u8, std::io::Error>| -> Result<(), ViewerError> {
@@ -148,7 +152,10 @@ pub fn start_serial_probe(custom_tty: &Option<String>) -> Result<crossbeam_chann
                         }
                     }
 
-                    std::thread::sleep(wait);
+                    /*let now = std::time::Instant::now();
+                    let dur = now.duration_since(time).as_millis();
+                    debug!("Poll executed in {}ms", dur);
+                    time = now;*/
 
                     Ok(())
                 },
