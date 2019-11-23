@@ -14,6 +14,12 @@ mod ui;
 pub use self::error::*;
 
 pub fn main() {
+    if let Ok(env) = std::env::var("RUST_LOG") {
+        std::env::set_var("RUST_LOG", format!("b0xx_viewer=info,{}", env));
+    } else {
+        std::env::set_var("RUST_LOG", "b0xx_viewer=info");
+    }
+
     pretty_env_logger::init();
 
     let options = cli::cli_options();
