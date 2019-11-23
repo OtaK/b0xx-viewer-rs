@@ -1,5 +1,42 @@
 use crate::b0xx_state::*;
 use crate::error::ViewerError;
+use lazy_static::lazy_static;
+use serde::{Deserialize, Serialize};
+
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+struct WhitelistFile {
+    arduino: Vec<UsbStringDef>
+}
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+struct UsbStringDef {
+    pub vid: String,
+    pub pid: String,
+}
+#[derive(Debug, Clone, Copy, Eq, PartialEq)]
+struct UsbDefinition {
+    pub vid: u16,
+    pub pid: u16,
+}
+
+impl std::convert::TryFrom<UsbStringDef> for UsbDefinition {
+    type Error = std::num::ParseIntError;
+
+    fn try_from(def: UsbStringDef) -> Result<Self, Self::Error> {
+        Ok(Self {
+            pid: u16::from_str_radix(def.pid.trim_start_matches("0x"), 16)?,
+            vid: u16::from_str_radix(def.vid.trim_start_matches("0x"), 16)?,
+        })
+    }
+}
+
+const ARDUINO_WHITELIST_BYTES: &[u8] = include_bytes!("../assets/arduino_whitelist.toml");
+lazy_static! {
+    static ref ARDUINO_WHITELIST: Vec<UsbDefinition> = {
+        let res: WhitelistFile = toml::from_slice(ARDUINO_WHITELIST_BYTES).unwrap();
+        use std::convert::TryFrom as _;
+        res.arduino.into_iter().map(|s_def| UsbDefinition::try_from(s_def).unwrap()).collect()
+    };
+}
 
 #[cfg_attr(feature = "fake_serial", allow(dead_code))]
 #[derive(Debug)]
@@ -31,9 +68,11 @@ pub fn start_serial_probe(custom_tty: &Option<String>) -> Result<crossbeam_chann
                     return true;
                 }
             } else if let serialport::SerialPortType::UsbPort(portinfo) = &port.port_type {
-                if portinfo.vid == 9025
-                    && (std::env::var("RELAX_ARDUINO_DETECT").is_ok() || portinfo.pid == 32822)
-                {
+                if std::env::var("RELAX_ARDUINO_DETECT").is_ok() {
+                    if ARDUINO_WHITELIST.iter().find(|def| def.vid == portinfo.vid && def.pid == portinfo.pid).is_some() {
+                        return true;
+                    }
+                } else if portinfo.vid == 9025 && portinfo.pid == 32822 {
                     return true;
                 }
 
@@ -138,9 +177,12 @@ pub fn start_serial_probe(custom_tty: &Option<String>) -> Result<crossbeam_chann
 }
 
 #[cfg(feature = "fake_serial")]
-pub fn start_serial_probe(_: Option<String>) -> Result<crossbeam_channel::Receiver<B0xxMessage>, ViewerError> {
+pub fn start_serial_probe(_: &Option<String>) -> Result<crossbeam_channel::Receiver<B0xxMessage>, ViewerError> {
     let (tx, rx) = crossbeam_channel::unbounded();
     let wait = std::time::Duration::from_micros(8200);
+    if std::env::var("RELAX_ARDUINO_DETECT").is_ok() {
+        info!("{:#?}", *ARDUINO_WHITELIST)
+    }
     std::thread::spawn(move || loop {
         let _ = tx.send(B0xxMessage::State(B0xxState::random()));
         std::thread::sleep(wait);

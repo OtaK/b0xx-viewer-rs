@@ -1,0 +1,125 @@
+# Arduino Yún
+[[arduino]]
+vid = "0x2341"
+pid = "0x0041"
+[[arduino]]
+vid = "0x2341"
+pid = "0x8041"
+[[arduino]]
+vid = "0x2A03"
+pid = "0x0041"
+[[arduino]]
+vid = "0x2A03"
+pid = "0x8041"
+
+# Linino One
+[[arduino]]
+vid = "0x2a03"
+pid = "0x0001"
+[[arduino]]
+vid = "0x2a03"
+pid = "0x8001"
+
+# Arduino/Genuino Uno
+[[arduino]]
+vid = "0x2341"
+pid = "0x0043"
+[[arduino]]
+vid = "0x2341"
+pid = "0x0001"
+[[arduino]]
+vid = "0x2A03"
+pid = "0x0043"
+[[arduino]]
+vid = "0x2341"
+pid = "0x0243"
+
+# Arduino/Genuino Mega or Mega 2560
+[[arduino]]
+vid = "0x2341"
+pid = "0x0010"
+[[arduino]]
+vid = "0x2341"
+pid = "0x0042"
+[[arduino]]
+vid = "0x2A03"
+pid = "0x0010"
+[[arduino]]
+vid = "0x2A03"
+pid = "0x0042"
+[[arduino]]
+vid = "0x2341"
+pid = "0x0210"
+[[arduino]]
+vid = "0x2341"
+pid = "0x0242"
+
+# Arduino Mega ADK
+[[arduino]]
+vid = "0x2341"
+pid = "0x003f"
+[[arduino]]
+vid = "0x2341"
+pid = "0x0044"
+[[arduino]]
+vid = "0x2A03"
+pid = "0x003f"
+[[arduino]]
+vid = "0x2A03"
+pid = "0x0044"
+
+# Arduino Leonardo
+[[arduino]]
+vid = "0x2341"
+pid = "0x0036"
+[[arduino]]
+vid = "0x2341"
+pid = "0x8036"
+[[arduino]]
+vid = "0x2A03"
+pid = "0x0036"
+[[arduino]]
+vid = "0x2A03"
+pid = "0x8036"
+
+# Arduino Leonardo ETH
+[[arduino]]
+vid = "0x2a03"
+pid = "0x0040"
+[[arduino]]
+vid = "0x2a03"
+pid = "0x8040"
+
+# Arduino / Genuino Micro
+[[arduino]]
+vid = "0x2341"
+pid = "0x0037"
+[[arduino]]
+vid = "0x2341"
+pid = "0x8037"
+[[arduino]]
+vid = "0x2A03"
+pid = "0x0037"
+[[arduino]]
+vid = "0x2A03"
+pid = "0x8037"
+[[arduino]]
+vid = "0x2341"
+pid = "0x0237"
+[[arduino]]
+vid = "0x2341"
+pid = "0x8237"
+
+# Arduino Esplora
+[[arduino]]
+vid = "0x2341"
+pid = "0x003C"
+[[arduino]]
+vid = "0x2341"
+pid = "0x803C"
+[[arduino]]
+vid = "0x2A03"
+pid = "0x003C"
+[[arduino]]
+vid = "0x2A03"
+pid = "0x803C"

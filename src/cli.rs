@@ -14,8 +14,8 @@ pub fn cli_options() -> ViewerOptions {
         (@arg init_config: --init_config "Intializes an empty configuration in the executable's folder")
         (@arg config: -c --config +takes_value "Sets the configuration file path")
         (@arg chromeless: --chromeless "Makes the window chromeless")
-        (@arg tty: --tty +takes_value "Provide a custom COM port (Windows-only) or a /dev/ttyXXX path (Unix). Bypasses auto-detection")
-        (@arg relax_arduino: --relax_arduino_detection "Relaxes B0XX detection to allow any Arduino device to connect")
+        (@arg tty: --tty +takes_value "Provide a custom COM port (Windows-only) or a /dev/ttyXXX path (Unix). Bypasses auto-detection, so proceed at your own risk!")
+        (@arg relax_arduino: --relax_arduino_detection "Relaxes B0XX detection to allow any 16MHz Arduino-compatible device to connect")
     )
     .get_matches();
 
