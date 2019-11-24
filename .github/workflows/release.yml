@@ -33,9 +33,9 @@ jobs:
           command: test
           args: --release
       - name: Move/rename executable (Linux)
-        if: matrix.os != 'windows-latest'
+        if: matrix.os == 'ubuntu-latest'
         run: |
-          mv target/release/b0xx_viewer.exe b0xx_viewer_linux_${{ github.event.release.tag_name }}
+          mv target/release/b0xx_viewer b0xx_viewer_linux_${{ github.event.release.tag_name }}
       - name: Move/rename executable (macOS)
         if: matrix.os == 'macos-latest'
         run: |
