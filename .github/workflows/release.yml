@@ -32,18 +32,19 @@ jobs:
         with:
           command: test
           args: --release
-      - name: Create artifact archive (Linux)
-        if: matrix.os == 'ubuntu-latest'
+      - name: Move/rename executable (Linux)
+        if: matrix.os != 'windows-latest'
         run: |
-          zip -r b0xx_viewer_linux_release_${{ github.event.release.tag_name }}.zip assets target/release/b0xx_viewer
-      - name: Create artifact archive (macOS)
+          mv target/release/b0xx_viewer.exe b0xx_viewer_linux_${{ github.event.release.tag_name }}
+      - name: Move/rename executable (macOS)
         if: matrix.os == 'macos-latest'
         run: |
-          zip -r b0xx_viewer_macos_release_${{ github.event.release.tag_name }}.zip assets target/release/b0xx_viewer
-      - name: Create artifact archive (Windows)
+          mv target/release/b0xx_viewer b0xx_viewer_macos_${{ github.event.release.tag_name }}
+      - name: Move/rename executable (Windows)
         if: matrix.os == 'windows-latest'
+        shell: bash
         run: |
-          zip -r b0xx_viewer_windows_release_${{ github.event.release.tag_name }}.zip assets target/release/b0xx_viewer.exe
+          mv target/release/b0xx_viewer.exe b0xx_viewer_windows_${{ github.event.release.tag_name }}.exe
       - name: Upload Release Asset (Linux)
         if: matrix.os == 'ubuntu-latest'
         uses: actions/upload-release-asset@v1.0.1
@@ -51,8 +52,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ github.event.release.upload_url }}
-          asset_path: ./b0xx_viewer_linux_release_${{ github.event.release.tag_name }}.zip
-          asset_name: b0xx_viewer_linux_release_${{ github.event.release.tag_name }}.zip
+          asset_path: ./b0xx_viewer_linux_${{ github.event.release.tag_name }}
+          asset_name: b0xx_viewer_linux_${{ github.event.release.tag_name }}
           asset_content_type: application/zip
       - name: Upload Release Asset (Windows)
         if: matrix.os == 'windows-latest'
@@ -61,8 +62,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ github.event.release.upload_url }}
-          asset_path: ./b0xx_viewer_windows_release_${{ github.event.release.tag_name }}.zip
-          asset_name: b0xx_viewer_windows_release_${{ github.event.release.tag_name }}.zip
+          asset_path: ./b0xx_viewer_windows_${{ github.event.release.tag_name }}.exe
+          asset_name: b0xx_viewer_windows_${{ github.event.release.tag_name }}.exe
           asset_content_type: application/zip
       - name: Upload Release Asset (macOS)
         if: matrix.os == 'macos-latest'
@@ -71,6 +72,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ github.event.release.upload_url }}
-          asset_path: ./b0xx_viewer_macos_release_${{ github.event.release.tag_name }}.zip
-          asset_name: b0xx_viewer_macos_release_${{ github.event.release.tag_name }}.zip
+          asset_path: ./b0xx_viewer_macos_${{ github.event.release.tag_name }}
+          asset_name: b0xx_viewer_macos_${{ github.event.release.tag_name }}
           asset_content_type: application/zip
