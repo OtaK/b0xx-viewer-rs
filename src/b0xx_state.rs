@@ -55,6 +55,8 @@ pub struct B0xxState {
     pub c_right: bool,
     pub c_up: bool,
     pub c_down: bool,
+    pub mod_ls: bool,
+    pub mod_ms: bool,
 }
 
 #[cfg(feature = "fake_serial")]
@@ -79,6 +81,8 @@ impl B0xxState {
             c_right: rand::random::<bool>(),
             c_up: rand::random::<bool>(),
             c_down: rand::random::<bool>(),
+            mod_ls: rand::random::<bool>(),
+            mod_ms: rand::random::<bool>(),
         }
     }
 }
@@ -87,7 +91,7 @@ impl TryFrom<&[B0xxReport]> for B0xxState {
     type Error = crate::error::ViewerError;
 
     fn try_from(value: &[B0xxReport]) -> Result<Self, Self::Error> {
-        if value.len() < 18 {
+        if value.len() < 20 {
             return Err(crate::error::ViewerError::MalformedSerialReport);
         }
 
@@ -110,12 +114,14 @@ impl TryFrom<&[B0xxReport]> for B0xxState {
             c_right: value[15].into(),
             c_up: value[16].into(),
             c_down: value[17].into(),
+            mod_ls: value[18].into(),
+            mod_ms: value[19].into(),
         })
     }
 }
 
-impl From<[B0xxReport; 18]> for B0xxState {
-    fn from(value: [B0xxReport; 18]) -> Self {
+impl From<[B0xxReport; 20]> for B0xxState {
+    fn from(value: [B0xxReport; 20]) -> Self {
         B0xxState {
             start: value[0].into(),
             y: value[1].into(),
@@ -135,6 +141,8 @@ impl From<[B0xxReport; 18]> for B0xxState {
             c_right: value[15].into(),
             c_up: value[16].into(),
             c_down: value[17].into(),
+            mod_ls: value[18].into(),
+            mod_ms: value[19].into(),
         }
     }
 }
@@ -160,6 +168,8 @@ impl From<[B0xxReport; 25]> for B0xxState {
             c_right: value[15].into(),
             c_up: value[16].into(),
             c_down: value[17].into(),
+            mod_ls: value[18].into(),
+            mod_ms: value[19].into(),
         }
     }
 }

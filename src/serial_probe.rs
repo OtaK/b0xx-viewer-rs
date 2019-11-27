@@ -103,7 +103,7 @@ pub fn start_serial_probe(custom_tty: &Option<String>) -> Result<crossbeam_chann
         .name("b0xx_viewer_serial".into())
         .spawn(move || {
             let mut buf = [0u8; 25];
-            let mut state = [B0xxReport::default(); 18];
+            let mut state = [B0xxReport::default(); 20];
 
             let mut port =
                 match serialport::open_with_settings(&b0xx_port.port_name, &port_settings) {
@@ -152,7 +152,7 @@ pub fn start_serial_probe(custom_tty: &Option<String>) -> Result<crossbeam_chann
                     }
                 }
 
-                for (i, a) in buf.iter_mut().take(18).enumerate() {
+                for (i, a) in buf.iter_mut().take(20).enumerate() {
                     state[i] = (*a).into();
                     *a = 0;
                 }

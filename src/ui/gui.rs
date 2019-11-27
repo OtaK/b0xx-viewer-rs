@@ -429,6 +429,11 @@ pub fn render_gui(
             .set(ids.c_down_label, ui);
     }
 
+    // TODO: Mod LS / MS buttons
+    /* if options.is_r2_b0xx {
+
+    }*/
+
     fps_counter(ui, ids, app);
 }
 
