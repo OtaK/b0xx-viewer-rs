@@ -111,6 +111,20 @@ pub fn start_serial_probe(custom_tty: &Option<String>) -> Result<crossbeam_chann
                     Err(e) => return tx.send(B0xxMessage::Error(e.into())),
                 };
 
+            debug!("Buffer exhaustion started");
+            let mut exhaust_buffer = [0u8; 1];
+            loop {
+                if let Err(e) = port.read_exact(&mut exhaust_buffer).map_err(ViewerError::from) {
+                    error!("{:?}", e);
+                    return tx.send(B0xxMessage::Quit);
+                }
+
+                if exhaust_buffer[0] == B0xxReport::End as u8 {
+                    debug!("Buffer exhausted successfully, continuing...");
+                    break;
+                }
+            }
+
             if let Err(e) = port.clear(serialport::ClearBuffer::All) {
                 return tx.send(B0xxMessage::Error(e.into()));
             }
