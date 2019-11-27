@@ -32,5 +32,6 @@ pub fn main() {
         }
     };
 
+    info!("Serial probe up and running");
     ui::start_gui(rx, options)
 }

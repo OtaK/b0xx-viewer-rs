@@ -2,10 +2,9 @@ mod app;
 mod gui;
 mod support;
 
-use self::support::*;
-use crate::config::ViewerOptions;
+use self::{support::*, app::*};
 
-use crate::serial_probe::*;
+use crate::{config::ViewerOptions, serial_probe::*};
 
 use conrod_core::widget_ids;
 use conrod_glium::Renderer;
@@ -23,6 +22,8 @@ conrod_winit::conversion_fns!();
 widget_ids! {
     pub struct Ids {
         frame,
+        reconnect_bg,
+        reconnect_label,
         start_btn,
         y_btn,
         x_btn,
@@ -101,32 +102,41 @@ pub fn start_gui(mut rx: crossbeam_channel::Receiver<B0xxMessage>, options: View
     let image_map: conrod_core::image::Map<glium::texture::CompressedSrgbTexture2d> =
         conrod_core::image::Map::new();
 
-    let mut app = app::ViewerApp::default();
+    let mut app = ViewerApp::default();
 
     let mut renderer = Renderer::new(&display).unwrap();
 
     let mut pending_events = Vec::new();
 
     'main: loop {
-        let mut maybe_state = match rx.try_iter().last() {
+        match app.status {
+            ViewerAppStatus::NeedsReconnection => {
+                app.status = ViewerAppStatus::Reconnecting;
+                debug!("Trying to reconnect...");
+                drop(rx);
+                rx = reconnect(&options.custom_tty);
+                debug!("Reconnected successfully!");
+            },
+            _ => {}
+        }
+
+        let mut maybe_state = match rx.iter().next() {
             Some(message) => match message {
                 B0xxMessage::State(state) => {
                     debug!("{:#?}", state);
+                    app.status.set_running();
                     Some(state)
                 }
                 B0xxMessage::Error(e) => {
                     error!("{}", e);
-                    drop(rx);
-                    rx = reconnect(&options.custom_tty);
+                    app.status = ViewerAppStatus::NeedsReconnection;
                     None
                 }
                 B0xxMessage::Quit => {
                     break 'main;
                 }
                 B0xxMessage::Reconnect => {
-                    drop(rx);
-                    rx = reconnect(&options.custom_tty);
-
+                    app.status = ViewerAppStatus::NeedsReconnection;
                     None
                 }
             },
@@ -134,8 +144,7 @@ pub fn start_gui(mut rx: crossbeam_channel::Receiver<B0xxMessage>, options: View
         };
 
         if let Some(new_state) = maybe_state.take() {
-            let changed = app.update_state(new_state);
-            if changed {
+            if app.update_state(new_state) {
                 ui.handle_event(conrod_core::event::Input::Redraw);
             }
         }
