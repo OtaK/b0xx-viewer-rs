@@ -111,6 +111,9 @@ pub fn start_serial_probe(custom_tty: &Option<String>) -> Result<crossbeam_chann
                     Err(e) => return tx.send(B0xxMessage::Error(e.into())),
                 };
 
+            // Exhaust the initial buffer till we find the end of a report and consume it.
+            // This is caused by a UB in Windows' COM port handling causing partial reports
+            // sometimes
             debug!("Buffer exhaustion started");
             let mut exhaust_buffer = [0u8; 1];
             loop {

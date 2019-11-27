@@ -109,6 +109,7 @@ pub fn start_gui(mut rx: crossbeam_channel::Receiver<B0xxMessage>, options: View
     let mut pending_events = Vec::new();
 
     'main: loop {
+        // Reconnect to the device if needed
         match app.status {
             ViewerAppStatus::NeedsReconnection => {
                 app.status = ViewerAppStatus::Reconnecting;
@@ -143,20 +144,20 @@ pub fn start_gui(mut rx: crossbeam_channel::Receiver<B0xxMessage>, options: View
             None => None,
         };
 
+        // Redraw our window contents only and only if the state of inputs have
+        // changed in the current cached report
         if let Some(new_state) = maybe_state.take() {
             if app.update_state(new_state) {
                 ui.handle_event(conrod_core::event::Input::Redraw);
             }
         }
 
-        // Collect all pending events.
+        // Window event processing
         events_loop.poll_events(|event| pending_events.push(event));
-
-        // Handle all events.
         for event in pending_events.drain(..) {
             match &event {
                 glium::glutin::Event::WindowEvent { event, .. } => match event {
-                    // Break from the loop upon `Escape`.
+                    // Exit the program upon pressing `Escape`.
                     glium::glutin::WindowEvent::CloseRequested
                     | glium::glutin::WindowEvent::KeyboardInput {
                         input:
@@ -172,7 +173,7 @@ pub fn start_gui(mut rx: crossbeam_channel::Receiver<B0xxMessage>, options: View
             }
         }
 
-        // Instantiate a GUI demonstrating every widget type provided by conrod.
+        // Instantiate the b0xx viewer GUI
         gui::render_gui(&mut ui.set_widgets(), &ids, &mut app, &options);
 
         // Draw the `Ui`.

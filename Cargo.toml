@@ -1,6 +1,6 @@
 [package]
 name = "b0xx-viewer-rs"
-version = "0.2.0"
+version = "0.3.0"
 authors = ["Mathieu Amiot <amiot.mathieu@gmail.com>"]
 description = "GUI Viewer for B0XX controllers; particularly useful for streaming"
 edition = "2018"
@@ -32,7 +32,7 @@ clap = "2.33.0"
 lazy_static = "1.4.0"
 fps_counter = {version = "1.0.0", optional = true }
 rusttype = "^0.7.9"
-serde = { version = "1.0.102", features = ["derive"] }
+serde = { version = "1.0.103", features = ["derive"] }
 toml = "0.5.5"
 rgb = { version = "0.8.14", features = ["serde"] }
 

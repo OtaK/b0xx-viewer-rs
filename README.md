@@ -20,19 +20,20 @@ Download the executable, and launch it through a terminal.
 
 Try launching the executable with `--help` to get all the current options
 
-```
-b0xx_viewer 0.2.0
+```text
+b0xx_viewer 0.3.0
 Mathieu Amiot <amiot.mathieu@gmail.com>
 GUI Viewer for B0XX controllers; particularly useful for streaming
 
 USAGE:
-    b0xx_viewer [FLAGS] [OPTIONS]
+    b0xx_viewer.exe [FLAGS] [OPTIONS]
 
 FLAGS:
         --chromeless                 Makes the window chromeless
     -h, --help                       Prints help information
         --init_config                Intializes an empty configuration in the executable's folder
     -l, --labels                     Enable button labels
+        --r2                         Enables B0XX r2 mode to account for the 2 extra buttons
         --relax_arduino_detection    Relaxes B0XX detection to allow any 16MHz Arduino-compatible device to connect
     -V, --version                    Prints version information
 
@@ -45,9 +46,16 @@ OPTIONS:
                                            Bypasses auto-detection, so proceed at your own risk!
 ```
 
+### Configuration file
+
+A good example is in `cfg/gcc.toml`
+
+You can create your own configuration file by launching the program with the `--init_config` option, then modify it with your favorite text editor!
+
 ## Building
 
 Prequisites:
+
 - Rust
 - Linux-only: `libudev-dev`, `libxcb-shape0-dev`, `libxcb-xfixes0-dev`
 

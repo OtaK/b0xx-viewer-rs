@@ -2,7 +2,6 @@ use super::{app::*, Ids};
 use crate::config::ViewerOptions;
 use crate::ui::support::{BTN_RADIUS, WIN_H, WIN_W};
 
-/// A set of reasonable stylistic defaults that works for the `gui` below.
 pub fn theme() -> conrod_core::Theme {
     use conrod_core::position::{Align, Direction, Padding, Position, Relative};
     conrod_core::Theme {
@@ -33,7 +32,12 @@ pub fn render_gui(
 ) {
     use conrod_core::{widget, Colorable, Positionable, Sizeable, Widget};
 
-    let btn_label_margin = BTN_RADIUS / 2. - ui.theme().font_size_small as f64 + 1.;
+    // Compute button margin only if necessary
+    let btn_label_margin = if options.display_labels {
+        BTN_RADIUS / 2. - ui.theme().font_size_small as f64 + 1.
+    } else {
+        0.
+    };
 
     widget::Canvas::new()
         .color(options.background_color.into())
