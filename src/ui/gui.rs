@@ -1,4 +1,4 @@
-use super::{app::ViewerApp, Ids};
+use super::{app::*, Ids};
 use crate::config::ViewerOptions;
 use crate::ui::support::{BTN_RADIUS, WIN_H, WIN_W};
 
@@ -39,6 +39,22 @@ pub fn render_gui(
         .x_y(0., 0.)
         .crop_kids()
         .set(ids.frame, ui);
+
+    if app.status == ViewerAppStatus::Reconnecting || app.status == ViewerAppStatus::NeedsReconnection {
+        conrod_core::widget::Rectangle::fill_with(
+            [WIN_W.into(), WIN_H.into()].into(),
+            conrod_core::color::BLACK.with_alpha(0.8)
+        )
+            .w_h(WIN_W.into(), WIN_H.into())
+            .x_y(0., 0.)
+            .crop_kids()
+            .set(ids.reconnect_bg, ui);
+
+        conrod_core::widget::Text::new("Reconnecting...")
+            .color(conrod_core::color::WHITE)
+            .middle_of(ids.reconnect_bg)
+            .set(ids.reconnect_label, ui);
+    }
 
     let (btn, mut m_text) = make_button(
         app.state.start,

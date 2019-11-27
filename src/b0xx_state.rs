@@ -113,3 +113,53 @@ impl TryFrom<&[B0xxReport]> for B0xxState {
         })
     }
 }
+
+impl From<[B0xxReport; 18]> for B0xxState {
+    fn from(value: [B0xxReport; 18]) -> Self {
+        B0xxState {
+            start: value[0].into(),
+            y: value[1].into(),
+            x: value[2].into(),
+            b: value[3].into(),
+            a: value[4].into(),
+            l: value[5].into(),
+            r: value[6].into(),
+            z: value[7].into(),
+            up: value[8].into(),
+            down: value[9].into(),
+            right: value[10].into(),
+            left: value[11].into(),
+            mod_x: value[12].into(),
+            mod_y: value[13].into(),
+            c_left: value[14].into(),
+            c_right: value[15].into(),
+            c_up: value[16].into(),
+            c_down: value[17].into(),
+        }
+    }
+}
+
+impl From<[B0xxReport; 25]> for B0xxState {
+    fn from(value: [B0xxReport; 25]) -> Self {
+        B0xxState {
+            start: value[0].into(),
+            y: value[1].into(),
+            x: value[2].into(),
+            b: value[3].into(),
+            a: value[4].into(),
+            l: value[5].into(),
+            r: value[6].into(),
+            z: value[7].into(),
+            up: value[8].into(),
+            down: value[9].into(),
+            right: value[10].into(),
+            left: value[11].into(),
+            mod_x: value[12].into(),
+            mod_y: value[13].into(),
+            c_left: value[14].into(),
+            c_right: value[15].into(),
+            c_up: value[16].into(),
+            c_down: value[17].into(),
+        }
+    }
+}
