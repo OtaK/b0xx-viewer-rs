@@ -33,6 +33,8 @@ pub fn render_gui(
 ) {
     use conrod_core::{widget, Colorable, Positionable, Sizeable, Widget};
 
+    let btn_label_margin = BTN_RADIUS / 2. - ui.theme().font_size_small as f64 + 1.;
+
     widget::Canvas::new()
         .color(options.background_color.into())
         .w_h(WIN_W.into(), WIN_H.into())
@@ -72,7 +74,7 @@ pub fn render_gui(
     if let Some(text_color) = m_text.take() {
         conrod_core::widget::Text::new("SRT")
             .color(text_color)
-            .middle_of(ids.start_btn)
+            .mid_top_with_margin_on(ids.start_btn, btn_label_margin)
             .set(ids.start_label, ui);
     }
 
@@ -93,7 +95,7 @@ pub fn render_gui(
     if let Some(text_color) = m_text.take() {
         conrod_core::widget::Text::new("→")
             .color(text_color)
-            .middle_of(ids.right_btn)
+            .mid_top_with_margin_on(ids.right_btn, btn_label_margin)
             .set(ids.right_label, ui);
     }
 
@@ -114,7 +116,7 @@ pub fn render_gui(
     if let Some(text_color) = m_text.take() {
         conrod_core::widget::Text::new("↓")
             .color(text_color)
-            .middle_of(ids.down_btn)
+            .mid_top_with_margin_on(ids.down_btn, btn_label_margin)
             .set(ids.down_label, ui);
     }
 
@@ -135,7 +137,7 @@ pub fn render_gui(
     if let Some(text_color) = m_text.take() {
         conrod_core::widget::Text::new("←")
             .color(text_color)
-            .middle_of(ids.left_btn)
+            .mid_top_with_margin_on(ids.left_btn, btn_label_margin)
             .set(ids.left_label, ui);
     }
 
@@ -156,7 +158,7 @@ pub fn render_gui(
     if let Some(text_color) = m_text.take() {
         conrod_core::widget::Text::new("L")
             .color(text_color)
-            .middle_of(ids.l_btn)
+            .mid_top_with_margin_on(ids.l_btn, btn_label_margin)
             .set(ids.l_label, ui);
     }
 
@@ -177,7 +179,7 @@ pub fn render_gui(
     if let Some(text_color) = m_text.take() {
         conrod_core::widget::Text::new("MX")
             .color(text_color)
-            .middle_of(ids.mod_x_btn)
+            .mid_top_with_margin_on(ids.mod_x_btn, btn_label_margin)
             .set(ids.mod_x_label, ui);
     }
 
@@ -198,7 +200,7 @@ pub fn render_gui(
     if let Some(text_color) = m_text.take() {
         conrod_core::widget::Text::new("MY")
             .color(text_color)
-            .middle_of(ids.mod_y_btn)
+            .mid_top_with_margin_on(ids.mod_y_btn, btn_label_margin)
             .set(ids.mod_y_label, ui);
     }
 
@@ -219,7 +221,7 @@ pub fn render_gui(
     if let Some(text_color) = m_text.take() {
         conrod_core::widget::Text::new("B")
             .color(text_color)
-            .middle_of(ids.b_btn)
+            .mid_top_with_margin_on(ids.b_btn, btn_label_margin)
             .set(ids.b_label, ui);
     }
 
@@ -240,7 +242,7 @@ pub fn render_gui(
     if let Some(text_color) = m_text.take() {
         conrod_core::widget::Text::new("X")
             .color(text_color)
-            .middle_of(ids.x_btn)
+            .mid_top_with_margin_on(ids.x_btn, btn_label_margin)
             .set(ids.x_label, ui);
     }
 
@@ -261,7 +263,7 @@ pub fn render_gui(
     if let Some(text_color) = m_text.take() {
         conrod_core::widget::Text::new("Z")
             .color(text_color)
-            .middle_of(ids.z_btn)
+            .mid_top_with_margin_on(ids.z_btn, btn_label_margin)
             .set(ids.z_label, ui);
     }
 
@@ -282,7 +284,7 @@ pub fn render_gui(
     if let Some(text_color) = m_text.take() {
         conrod_core::widget::Text::new("↑")
             .color(text_color)
-            .middle_of(ids.up_btn)
+            .mid_top_with_margin_on(ids.up_btn, btn_label_margin)
             .set(ids.up_label, ui);
     }
 
@@ -303,7 +305,7 @@ pub fn render_gui(
     if let Some(text_color) = m_text.take() {
         conrod_core::widget::Text::new("Y")
             .color(text_color)
-            .middle_of(ids.y_btn)
+            .mid_top_with_margin_on(ids.y_btn, btn_label_margin)
             .set(ids.y_label, ui);
     }
 
@@ -324,7 +326,7 @@ pub fn render_gui(
     if let Some(text_color) = m_text.take() {
         conrod_core::widget::Text::new("R")
             .color(text_color)
-            .middle_of(ids.r_btn)
+            .mid_top_with_margin_on(ids.r_btn, btn_label_margin)
             .set(ids.r_label, ui);
     }
 
@@ -345,7 +347,7 @@ pub fn render_gui(
     if let Some(text_color) = m_text.take() {
         conrod_core::widget::Text::new("A")
             .color(text_color)
-            .middle_of(ids.a_btn)
+            .mid_top_with_margin_on(ids.a_btn, btn_label_margin)
             .set(ids.a_label, ui);
     }
 
@@ -365,7 +367,7 @@ pub fn render_gui(
     if let Some(text_color) = m_text.take() {
         conrod_core::widget::Text::new("CU")
             .color(text_color)
-            .middle_of(ids.c_up_btn)
+            .mid_top_with_margin_on(ids.c_up_btn, btn_label_margin)
             .set(ids.c_up_label, ui);
     }
 
@@ -385,7 +387,7 @@ pub fn render_gui(
     if let Some(text_color) = m_text.take() {
         conrod_core::widget::Text::new("CL")
             .color(text_color)
-            .middle_of(ids.c_left_btn)
+            .mid_top_with_margin_on(ids.c_left_btn, btn_label_margin)
             .set(ids.c_left_label, ui);
     }
 
@@ -404,7 +406,7 @@ pub fn render_gui(
     if let Some(text_color) = m_text.take() {
         conrod_core::widget::Text::new("CR")
             .color(text_color)
-            .middle_of(ids.c_right_btn)
+            .mid_top_with_margin_on(ids.c_right_btn, btn_label_margin)
             .set(ids.c_right_label, ui);
     }
 
@@ -423,7 +425,7 @@ pub fn render_gui(
     if let Some(text_color) = m_text.take() {
         conrod_core::widget::Text::new("CD")
             .color(text_color)
-            .middle_of(ids.c_down_btn)
+            .mid_top_with_margin_on(ids.c_down_btn, btn_label_margin)
             .set(ids.c_down_label, ui);
     }
 
