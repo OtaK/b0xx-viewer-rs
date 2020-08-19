@@ -32,21 +32,29 @@ pub fn cli_options() -> ViewerOptions {
     }
 
     let mut ret = if let Some(config_path) = matches.value_of("config").take() {
-        ViewerOptions::load(config_path.into()).unwrap_or_default()
+        info!("Loading custom config at {}", config_path);
+        match ViewerOptions::load(config_path.into()) {
+            Ok(config) => config,
+            Err(e) => {
+                error!("{}", e);
+                error!("Falling back to default configuration");
+                ViewerOptions::default()
+            }
+        }
     } else {
         ViewerOptions::load_cwd().unwrap_or_default()
     };
 
     if matches.is_present("labels") {
-        ret.display_labels = true;
+        ret.display_labels = Some(true);
     }
 
     if matches.is_present("chromeless") {
-        ret.chromeless = true;
+        ret.chromeless = Some(true);
     }
 
     if matches.is_present("r2") {
-        ret.is_r2_b0xx = true;
+        ret.is_r2_b0xx = Some(true);
     }
 
     if let Some(tty) = matches.value_of("tty").take() {
@@ -87,6 +95,8 @@ pub fn cli_options() -> ViewerOptions {
     {
         ret.button_active_colors = ViewerButtonColors::new_with_color(hex_to_color!(bg));
     }
+
+    debug!("Configuration: {:#?}", ret);
 
     ret
 }

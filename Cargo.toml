@@ -1,6 +1,6 @@
 [package]
 name = "b0xx-viewer-rs"
-version = "0.3.0"
+version = "0.3.1"
 authors = ["Mathieu Amiot <amiot.mathieu@gmail.com>"]
 description = "GUI Viewer for B0XX controllers; particularly useful for streaming"
 edition = "2018"
@@ -16,25 +16,26 @@ name = "b0xx_viewer"
 path = "src/main.rs"
 
 [dependencies]
-serialport = "3.3.0"
-failure = "0.1.6"
-failure_derive = "0.1.6"
-pretty_env_logger = "0.3.1"
-log = "0.4.8"
-rand = { version = "0.7.2", optional = true }
-conrod_core = "0.68.0"
-conrod_winit = "0.68.0"
-conrod_glium = "0.68.0"
-glium = "0.24.0"
-winit = "0.19.5"
-crossbeam-channel = "0.4.0"
-clap = "2.33.0"
-lazy_static = "1.4.0"
-fps_counter = {version = "1.0.0", optional = true }
-rusttype = "^0.7.9"
-serde = { version = "1.0.103", features = ["derive"] }
-toml = "0.5.5"
-rgb = { version = "0.8.14", features = ["serde"] }
+serialport = "3.3"
+pretty_env_logger = "0.4"
+log = "0.4"
+rand = { version = "0.7", optional = true }
+conrod_core = "0.70"
+conrod_winit = "0.70"
+conrod_glium = "0.70"
+glium = "0.24"
+winit = "0.22"
+crossbeam-channel = "0.4"
+clap = "2.33"
+lazy_static = "1.4"
+fps_counter = { version = "1.0", optional = true }
+rusttype = "0.8"
+serde = { version = "1.0", features = ["derive"] }
+toml = "0.5"
+rgb = { version = "0.8", features = ["serde"] }
+anyhow = "1.0"
+thiserror = "1.0"
+backoff = "0.2.1"
 
 [target.'cfg(windows)'.build-dependencies]
 winres = "0.1"

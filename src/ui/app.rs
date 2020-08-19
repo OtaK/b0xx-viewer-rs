@@ -22,7 +22,6 @@ impl ViewerAppStatus {
     }
 }
 
-#[derive(Clone)]
 pub struct ViewerApp {
     pub state: B0xxState,
     pub status: ViewerAppStatus,

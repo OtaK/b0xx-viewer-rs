@@ -33,7 +33,7 @@ pub fn render_gui(
     use conrod_core::{widget, Colorable, Positionable, Sizeable, Widget};
 
     // Compute button margin only if necessary
-    let btn_label_margin = if options.display_labels {
+    let btn_label_margin = if options.display_labels.unwrap_or_default() {
         BTN_RADIUS / 2. - ui.theme().font_size_small as f64 + 1.
     } else {
         0.
@@ -462,12 +462,12 @@ fn make_button(
     parent: conrod_core::widget::Id,
     active_color: crate::config::ViewerColor,
     inactive_color: crate::config::ViewerColor,
-    display_labels: bool,
+    display_labels: Option<bool>,
 ) -> (conrod_core::widget::Oval<conrod_core::widget::primitive::shape::oval::Full>, Option<conrod_core::Color>) {
     use conrod_core::{widget, Colorable, Sizeable, Widget};
 
     let color = if state { active_color } else { inactive_color };
-    let text_color = if display_labels {
+    let text_color = if display_labels.unwrap_or_default() {
         let tmp: conrod_core::Color = color.clone().into();
         Some(tmp.plain_contrast())
     } else {

@@ -1,17 +1,16 @@
 use crate::error::ViewerError;
 use conrod_core::Color;
-use failure_derive::Fail;
 use lazy_static::lazy_static;
 use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Fail)]
+#[derive(Debug, thiserror::Error)]
 pub enum ConfigError {
-    #[fail(display = "The supplied config path could not be found on the filesystem.")]
+    #[error("The supplied config path could not be found on the filesystem.")]
     NotFound,
-    #[fail(display = "DeserializationError: {}", _0)]
-    DeserializationError(toml::de::Error),
-    #[fail(display = "SerializationError: {}", _0)]
-    SerializationError(toml::ser::Error),
+    #[error("DeserializationError: {0}")]
+    DeserializationError(#[from] toml::de::Error),
+    #[error("SerializationError: {0}")]
+    SerializationError(#[from] toml::ser::Error),
 }
 
 #[macro_export]
@@ -117,12 +116,12 @@ impl ViewerButtonColors {
 
 #[derive(Debug, Serialize, Deserialize, Clone, PartialEq)]
 pub struct ViewerOptions {
-    pub display_labels: bool,
-    pub chromeless: bool,
+    pub display_labels: Option<bool>,
+    pub chromeless: Option<bool>,
     pub background_color: ViewerColor,
     pub button_inactive_colors: ViewerButtonColors,
     pub button_active_colors: ViewerButtonColors,
-    pub is_r2_b0xx: bool,
+    pub is_r2_b0xx: Option<bool>,
     pub custom_tty: Option<String>,
     #[serde(skip)]
     path: std::path::PathBuf,
@@ -131,19 +130,25 @@ pub struct ViewerOptions {
 impl Default for ViewerOptions {
     fn default() -> Self {
         Self {
-            display_labels: false,
-            chromeless: false,
+            display_labels: None,
+            chromeless: None,
             background_color: *DEFAULT_BACKGROUND_COLOR,
             button_inactive_colors: ViewerButtonColors::new_with_color(*DEFAULT_INACTIVE_COLOR),
             button_active_colors: ViewerButtonColors::new_with_color(*DEFAULT_ACTIVE_COLOR),
             custom_tty: None,
-            is_r2_b0xx: false,
+            is_r2_b0xx: None,
             path: Default::default(),
         }
     }
 }
 
 impl ViewerOptions {
+    fn get_cwd() -> Result<std::path::PathBuf, ViewerError> {
+        let mut path = std::env::current_exe()?;
+        path.set_file_name(DEFAULT_FILENAME);
+        Ok(path)
+    }
+
     pub fn load(path: std::path::PathBuf) -> Result<Self, ViewerError> {
         if !path.exists() {
             return Err(ConfigError::NotFound.into());
@@ -151,16 +156,15 @@ impl ViewerOptions {
 
         let buf = std::fs::read(path.clone())?;
         let mut ret: ViewerOptions = toml::de::from_slice(&buf)
-            .map_err(|e| ViewerError::from(ConfigError::DeserializationError(e)))?;
+            .map_err(|e| ViewerError::from(ConfigError::from(e)))?;
 
         ret.path = path;
+        debug!("Loaded configuration: {:#?}", ret);
         Ok(ret)
     }
 
     pub fn load_cwd() -> Result<Self, ViewerError> {
-        let mut path = std::env::current_dir()?;
-        path.push(DEFAULT_FILENAME);
-        Self::load(path)
+        Self::load(Self::get_cwd()?)
     }
 
     pub fn save_to(&mut self, path: std::path::PathBuf) -> Result<(), ViewerError> {
@@ -172,8 +176,6 @@ impl ViewerOptions {
     }
 
     pub fn save_cwd(&mut self) -> Result<(), ViewerError> {
-        let mut path = std::env::current_dir()?;
-        path.push(DEFAULT_FILENAME);
-        self.save_to(path)
+        self.save_to(Self::get_cwd()?)
     }
 }

@@ -49,9 +49,15 @@ pub enum B0xxMessage {
 
 #[inline]
 pub fn reconnect(custom_tty: &Option<String>) -> crossbeam_channel::Receiver<B0xxMessage> {
+    use backoff::backoff::Backoff as _;
+    let mut backoff = backoff::ExponentialBackoff::default();
     loop {
         if let Ok(new_rx) = start_serial_probe(custom_tty) {
             return new_rx;
+        }
+
+        if let Some(backoff_duration) = backoff.next_backoff() {
+            std::thread::sleep(backoff_duration);
         }
     }
 }

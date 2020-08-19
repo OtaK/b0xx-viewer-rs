@@ -17,7 +17,7 @@ use conrod_winit::{
     convert_event, convert_key, convert_mouse_button, convert_mouse_cursor, convert_window_event,
 };
 
-conrod_winit::conversion_fns!();
+conrod_winit::v021_conversion_fns!();
 
 widget_ids! {
     pub struct Ids {
@@ -69,7 +69,7 @@ pub fn start_gui(mut rx: crossbeam_channel::Receiver<B0xxMessage>, options: View
     let mut events_loop = glium::glutin::EventsLoop::new();
 
     let window = glium::glutin::WindowBuilder::new()
-        .with_decorations(!options.chromeless)
+        .with_decorations(!options.chromeless.unwrap_or_default())
         .with_title(WIN_TITLE)
         .with_resizable(false)
         .with_dimensions((WIN_W, WIN_H).into());
@@ -124,7 +124,7 @@ pub fn start_gui(mut rx: crossbeam_channel::Receiver<B0xxMessage>, options: View
         let mut maybe_state = match rx.iter().next() {
             Some(message) => match message {
                 B0xxMessage::State(state) => {
-                    debug!("{:#?}", state);
+                    trace!("{:#?}", state);
                     app.status.set_running();
                     Some(state)
                 }
