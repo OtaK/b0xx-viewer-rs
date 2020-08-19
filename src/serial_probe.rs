@@ -5,7 +5,7 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 struct WhitelistFile {
-    arduino: Vec<UsbStringDef>
+    arduino: Vec<UsbStringDef>,
 }
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 struct UsbStringDef {
@@ -34,7 +34,10 @@ lazy_static! {
     static ref ARDUINO_WHITELIST: Vec<UsbDefinition> = {
         let res: WhitelistFile = toml::from_slice(ARDUINO_WHITELIST_BYTES).unwrap();
         use std::convert::TryFrom as _;
-        res.arduino.into_iter().map(|s_def| UsbDefinition::try_from(s_def).unwrap()).collect()
+        res.arduino
+            .into_iter()
+            .map(|s_def| UsbDefinition::try_from(s_def).unwrap())
+            .collect()
     };
 }
 
@@ -63,7 +66,9 @@ pub fn reconnect(custom_tty: &Option<String>) -> crossbeam_channel::Receiver<B0x
 }
 
 #[cfg(not(feature = "fake_serial"))]
-pub fn start_serial_probe(custom_tty: &Option<String>) -> Result<crossbeam_channel::Receiver<B0xxMessage>, ViewerError> {
+pub fn start_serial_probe(
+    custom_tty: &Option<String>,
+) -> Result<crossbeam_channel::Receiver<B0xxMessage>, ViewerError> {
     use std::io::Read;
 
     let b0xx_port = serialport::available_ports()?
@@ -75,7 +80,10 @@ pub fn start_serial_probe(custom_tty: &Option<String>) -> Result<crossbeam_chann
                 }
             } else if let serialport::SerialPortType::UsbPort(portinfo) = &port.port_type {
                 if std::env::var("RELAX_ARDUINO_DETECT").is_ok() {
-                    if ARDUINO_WHITELIST.iter().find(|def| def.vid == portinfo.vid && def.pid == portinfo.pid).is_some() {
+                    if ARDUINO_WHITELIST
+                        .iter()
+                        .any(|def| def.vid == portinfo.vid && def.pid == portinfo.pid)
+                    {
                         return true;
                     }
                 } else if portinfo.vid == 9025 && portinfo.pid == 32822 {
@@ -123,7 +131,10 @@ pub fn start_serial_probe(custom_tty: &Option<String>) -> Result<crossbeam_chann
             debug!("Buffer exhaustion started");
             let mut exhaust_buffer = [0u8; 1];
             loop {
-                if let Err(e) = port.read_exact(&mut exhaust_buffer).map_err(ViewerError::from) {
+                if let Err(e) = port
+                    .read_exact(&mut exhaust_buffer)
+                    .map_err(ViewerError::from)
+                {
                     error!("{:?}", e);
                     return tx.send(B0xxMessage::Quit);
                 }
@@ -150,12 +161,12 @@ pub fn start_serial_probe(custom_tty: &Option<String>) -> Result<crossbeam_chann
                                 return tx.send(B0xxMessage::Reconnect);
                             }
                             _ => {
-                                error!("{:?}", ViewerError::from(e));
+                                error!("{:?}", e);
                                 return tx.send(B0xxMessage::Quit);
                             }
                         },
                         _ => {
-                            error!("{:?}", ViewerError::from(e));
+                            error!("{:?}", e);
                             return tx.send(B0xxMessage::Quit);
                         }
                     }
@@ -166,7 +177,7 @@ pub fn start_serial_probe(custom_tty: &Option<String>) -> Result<crossbeam_chann
                     *a = 0;
                 }
 
-                if let Err(_) = tx.send(B0xxMessage::State(state.into())) {
+                if tx.send(B0xxMessage::State(state.into())).is_err() {
                     info!("Reconnection detected, exiting runloop");
                     return Ok(());
                 }
@@ -177,7 +188,9 @@ pub fn start_serial_probe(custom_tty: &Option<String>) -> Result<crossbeam_chann
 }
 
 #[cfg(feature = "fake_serial")]
-pub fn start_serial_probe(_: &Option<String>) -> Result<crossbeam_channel::Receiver<B0xxMessage>, ViewerError> {
+pub fn start_serial_probe(
+    _: &Option<String>,
+) -> Result<crossbeam_channel::Receiver<B0xxMessage>, ViewerError> {
     let (tx, rx) = crossbeam_channel::bounded(1);
     if std::env::var("RELAX_ARDUINO_DETECT").is_ok() {
         info!("{:#?}", *ARDUINO_WHITELIST)

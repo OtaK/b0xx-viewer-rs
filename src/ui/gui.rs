@@ -46,15 +46,17 @@ pub fn render_gui(
         .crop_kids()
         .set(ids.frame, ui);
 
-    if app.status == ViewerAppStatus::Reconnecting || app.status == ViewerAppStatus::NeedsReconnection {
+    if app.status == ViewerAppStatus::Reconnecting
+        || app.status == ViewerAppStatus::NeedsReconnection
+    {
         conrod_core::widget::Rectangle::fill_with(
-            [WIN_W.into(), WIN_H.into()].into(),
-            conrod_core::color::BLACK.with_alpha(0.8)
+            [WIN_W.into(), WIN_H.into()],
+            conrod_core::color::BLACK.with_alpha(0.8),
         )
-            .w_h(WIN_W.into(), WIN_H.into())
-            .x_y(0., 0.)
-            .crop_kids()
-            .set(ids.reconnect_bg, ui);
+        .w_h(WIN_W.into(), WIN_H.into())
+        .x_y(0., 0.)
+        .crop_kids()
+        .set(ids.reconnect_bg, ui);
 
         conrod_core::widget::Text::new("Reconnecting...")
             .color(conrod_core::color::WHITE)
@@ -70,10 +72,7 @@ pub fn render_gui(
         options.display_labels,
     );
 
-    btn
-        .x_y(0., 40.)
-        .set(ids.start_btn, ui);
-
+    btn.x_y(0., 40.).set(ids.start_btn, ui);
 
     if let Some(text_color) = m_text.take() {
         conrod_core::widget::Text::new("SRT")
@@ -81,7 +80,6 @@ pub fn render_gui(
             .mid_top_with_margin_on(ids.start_btn, btn_label_margin)
             .set(ids.start_label, ui);
     }
-
 
     let (btn, mut m_text) = make_button(
         app.state.right,
@@ -91,10 +89,8 @@ pub fn render_gui(
         options.display_labels,
     );
 
-    btn
-        .x_y_relative_to(ids.start_btn, -100., 5.)
+    btn.x_y_relative_to(ids.start_btn, -100., 5.)
         .set(ids.right_btn, ui);
-
 
     if let Some(text_color) = m_text.take() {
         conrod_core::widget::Text::new("→")
@@ -102,7 +98,6 @@ pub fn render_gui(
             .mid_top_with_margin_on(ids.right_btn, btn_label_margin)
             .set(ids.right_label, ui);
     }
-
 
     let (btn, mut m_text) = make_button(
         app.state.down,
@@ -112,10 +107,8 @@ pub fn render_gui(
         options.display_labels,
     );
 
-    btn
-        .x_y_relative_to(ids.right_btn, -45., 15.)
+    btn.x_y_relative_to(ids.right_btn, -45., 15.)
         .set(ids.down_btn, ui);
-
 
     if let Some(text_color) = m_text.take() {
         conrod_core::widget::Text::new("↓")
@@ -123,7 +116,6 @@ pub fn render_gui(
             .mid_top_with_margin_on(ids.down_btn, btn_label_margin)
             .set(ids.down_label, ui);
     }
-
 
     let (btn, mut m_text) = make_button(
         app.state.left,
@@ -133,10 +125,8 @@ pub fn render_gui(
         options.display_labels,
     );
 
-    btn
-        .x_y_relative_to(ids.down_btn, -45., -5.)
+    btn.x_y_relative_to(ids.down_btn, -45., -5.)
         .set(ids.left_btn, ui);
-
 
     if let Some(text_color) = m_text.take() {
         conrod_core::widget::Text::new("←")
@@ -144,7 +134,6 @@ pub fn render_gui(
             .mid_top_with_margin_on(ids.left_btn, btn_label_margin)
             .set(ids.left_label, ui);
     }
-
 
     let (btn, mut m_text) = make_button(
         app.state.l,
@@ -154,10 +143,8 @@ pub fn render_gui(
         options.display_labels,
     );
 
-    btn
-        .x_y_relative_to(ids.left_btn, -45., -15.)
+    btn.x_y_relative_to(ids.left_btn, -45., -15.)
         .set(ids.l_btn, ui);
-
 
     if let Some(text_color) = m_text.take() {
         conrod_core::widget::Text::new("L")
@@ -165,7 +152,6 @@ pub fn render_gui(
             .mid_top_with_margin_on(ids.l_btn, btn_label_margin)
             .set(ids.l_label, ui);
     }
-
 
     let (btn, mut m_text) = make_button(
         app.state.mod_x,
@@ -175,10 +161,8 @@ pub fn render_gui(
         options.display_labels,
     );
 
-    btn
-        .x_y_relative_to(ids.right_btn, 10., -120.)
+    btn.x_y_relative_to(ids.right_btn, 10., -120.)
         .set(ids.mod_x_btn, ui);
-
 
     if let Some(text_color) = m_text.take() {
         conrod_core::widget::Text::new("MX")
@@ -186,7 +170,6 @@ pub fn render_gui(
             .mid_top_with_margin_on(ids.mod_x_btn, btn_label_margin)
             .set(ids.mod_x_label, ui);
     }
-
 
     let (btn, mut m_text) = make_button(
         app.state.mod_y,
@@ -196,10 +179,8 @@ pub fn render_gui(
         options.display_labels,
     );
 
-    btn
-        .x_y_relative_to(ids.mod_x_btn, 40., -20.)
+    btn.x_y_relative_to(ids.mod_x_btn, 40., -20.)
         .set(ids.mod_y_btn, ui);
-
 
     if let Some(text_color) = m_text.take() {
         conrod_core::widget::Text::new("MY")
@@ -207,7 +188,6 @@ pub fn render_gui(
             .mid_top_with_margin_on(ids.mod_y_btn, btn_label_margin)
             .set(ids.mod_y_label, ui);
     }
-
 
     let (btn, mut m_text) = make_button(
         app.state.b,
@@ -217,10 +197,8 @@ pub fn render_gui(
         options.display_labels,
     );
 
-    btn
-        .x_y_relative_to(ids.start_btn, 100., 5.)
+    btn.x_y_relative_to(ids.start_btn, 100., 5.)
         .set(ids.b_btn, ui);
-
 
     if let Some(text_color) = m_text.take() {
         conrod_core::widget::Text::new("B")
@@ -228,7 +206,6 @@ pub fn render_gui(
             .mid_top_with_margin_on(ids.b_btn, btn_label_margin)
             .set(ids.b_label, ui);
     }
-
 
     let (btn, mut m_text) = make_button(
         app.state.x,
@@ -238,10 +215,7 @@ pub fn render_gui(
         options.display_labels,
     );
 
-    btn
-        .x_y_relative_to(ids.b_btn, 45., 15.)
-        .set(ids.x_btn, ui);
-
+    btn.x_y_relative_to(ids.b_btn, 45., 15.).set(ids.x_btn, ui);
 
     if let Some(text_color) = m_text.take() {
         conrod_core::widget::Text::new("X")
@@ -249,7 +223,6 @@ pub fn render_gui(
             .mid_top_with_margin_on(ids.x_btn, btn_label_margin)
             .set(ids.x_label, ui);
     }
-
 
     let (btn, mut m_text) = make_button(
         app.state.z,
@@ -259,10 +232,7 @@ pub fn render_gui(
         options.display_labels,
     );
 
-    btn
-        .x_y_relative_to(ids.x_btn, 45., -5.)
-        .set(ids.z_btn, ui);
-
+    btn.x_y_relative_to(ids.x_btn, 45., -5.).set(ids.z_btn, ui);
 
     if let Some(text_color) = m_text.take() {
         conrod_core::widget::Text::new("Z")
@@ -270,7 +240,6 @@ pub fn render_gui(
             .mid_top_with_margin_on(ids.z_btn, btn_label_margin)
             .set(ids.z_label, ui);
     }
-
 
     let (btn, mut m_text) = make_button(
         app.state.up,
@@ -280,10 +249,8 @@ pub fn render_gui(
         options.display_labels,
     );
 
-    btn
-        .x_y_relative_to(ids.z_btn, 45., -15.)
+    btn.x_y_relative_to(ids.z_btn, 45., -15.)
         .set(ids.up_btn, ui);
-
 
     if let Some(text_color) = m_text.take() {
         conrod_core::widget::Text::new("↑")
@@ -291,7 +258,6 @@ pub fn render_gui(
             .mid_top_with_margin_on(ids.up_btn, btn_label_margin)
             .set(ids.up_label, ui);
     }
-
 
     let (btn, mut m_text) = make_button(
         app.state.y,
@@ -301,10 +267,7 @@ pub fn render_gui(
         options.display_labels,
     );
 
-    btn
-        .x_y_relative_to(ids.x_btn, 2., 45.)
-        .set(ids.y_btn, ui);
-
+    btn.x_y_relative_to(ids.x_btn, 2., 45.).set(ids.y_btn, ui);
 
     if let Some(text_color) = m_text.take() {
         conrod_core::widget::Text::new("Y")
@@ -312,7 +275,6 @@ pub fn render_gui(
             .mid_top_with_margin_on(ids.y_btn, btn_label_margin)
             .set(ids.y_label, ui);
     }
-
 
     let (btn, mut m_text) = make_button(
         app.state.r,
@@ -322,10 +284,7 @@ pub fn render_gui(
         options.display_labels,
     );
 
-    btn
-        .x_y_relative_to(ids.b_btn, 2., 45.)
-        .set(ids.r_btn, ui);
-
+    btn.x_y_relative_to(ids.b_btn, 2., 45.).set(ids.r_btn, ui);
 
     if let Some(text_color) = m_text.take() {
         conrod_core::widget::Text::new("R")
@@ -333,7 +292,6 @@ pub fn render_gui(
             .mid_top_with_margin_on(ids.r_btn, btn_label_margin)
             .set(ids.r_label, ui);
     }
-
 
     let (btn, mut m_text) = make_button(
         app.state.a,
@@ -343,10 +301,8 @@ pub fn render_gui(
         options.display_labels,
     );
 
-    btn
-        .x_y_relative_to(ids.b_btn, -10., -120.)
+    btn.x_y_relative_to(ids.b_btn, -10., -120.)
         .set(ids.a_btn, ui);
-
 
     if let Some(text_color) = m_text.take() {
         conrod_core::widget::Text::new("A")
@@ -354,7 +310,6 @@ pub fn render_gui(
             .mid_top_with_margin_on(ids.a_btn, btn_label_margin)
             .set(ids.a_label, ui);
     }
-
 
     let (btn, mut m_text) = make_button(
         app.state.c_up,
@@ -364,8 +319,7 @@ pub fn render_gui(
         options.display_labels,
     );
 
-    btn
-        .x_y_relative_to(ids.a_btn, 1., 48.)
+    btn.x_y_relative_to(ids.a_btn, 1., 48.)
         .set(ids.c_up_btn, ui);
 
     if let Some(text_color) = m_text.take() {
@@ -375,7 +329,6 @@ pub fn render_gui(
             .set(ids.c_up_label, ui);
     }
 
-
     let (btn, mut m_text) = make_button(
         app.state.c_left,
         ids.frame,
@@ -384,8 +337,7 @@ pub fn render_gui(
         options.display_labels,
     );
 
-    btn
-        .x_y_relative_to(ids.c_up_btn, -34., -24.)
+    btn.x_y_relative_to(ids.c_up_btn, -34., -24.)
         .set(ids.c_left_btn, ui);
 
     if let Some(text_color) = m_text.take() {
@@ -403,8 +355,7 @@ pub fn render_gui(
         options.display_labels,
     );
 
-    btn
-        .x_y_relative_to(ids.c_up_btn, 34., -24.)
+    btn.x_y_relative_to(ids.c_up_btn, 34., -24.)
         .set(ids.c_right_btn, ui);
 
     if let Some(text_color) = m_text.take() {
@@ -422,8 +373,7 @@ pub fn render_gui(
         options.display_labels,
     );
 
-    btn
-        .x_y_relative_to(ids.c_left_btn, 0., -48.)
+    btn.x_y_relative_to(ids.c_left_btn, 0., -48.)
         .set(ids.c_down_btn, ui);
 
     if let Some(text_color) = m_text.take() {
@@ -463,7 +413,10 @@ fn make_button(
     active_color: crate::config::ViewerColor,
     inactive_color: crate::config::ViewerColor,
     display_labels: Option<bool>,
-) -> (conrod_core::widget::Oval<conrod_core::widget::primitive::shape::oval::Full>, Option<conrod_core::Color>) {
+) -> (
+    conrod_core::widget::Oval<conrod_core::widget::primitive::shape::oval::Full>,
+    Option<conrod_core::Color>,
+) {
     use conrod_core::{widget, Colorable, Sizeable, Widget};
 
     let color = if state { active_color } else { inactive_color };
@@ -480,6 +433,6 @@ fn make_button(
             .parent(parent)
             .graphics_for(parent)
             .w_h(BTN_RADIUS, BTN_RADIUS),
-        text_color
+        text_color,
     )
 }

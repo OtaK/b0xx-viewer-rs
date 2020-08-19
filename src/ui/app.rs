@@ -5,7 +5,7 @@ pub enum ViewerAppStatus {
     Running,
     Reconnecting,
     NeedsReconnection,
-    Undefined
+    Undefined,
 }
 
 impl Default for ViewerAppStatus {

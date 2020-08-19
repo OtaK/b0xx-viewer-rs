@@ -155,8 +155,8 @@ impl ViewerOptions {
         }
 
         let buf = std::fs::read(path.clone())?;
-        let mut ret: ViewerOptions = toml::de::from_slice(&buf)
-            .map_err(|e| ViewerError::from(ConfigError::from(e)))?;
+        let mut ret: ViewerOptions =
+            toml::de::from_slice(&buf).map_err(|e| ViewerError::from(ConfigError::from(e)))?;
 
         ret.path = path;
         debug!("Loaded configuration: {:#?}", ret);

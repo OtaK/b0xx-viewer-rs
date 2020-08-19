@@ -2,7 +2,7 @@ mod app;
 mod gui;
 mod support;
 
-use self::{support::*, app::*};
+use self::{app::*, support::*};
 
 use crate::{config::ViewerOptions, serial_probe::*};
 
@@ -110,15 +110,12 @@ pub fn start_gui(mut rx: crossbeam_channel::Receiver<B0xxMessage>, options: View
 
     'main: loop {
         // Reconnect to the device if needed
-        match app.status {
-            ViewerAppStatus::NeedsReconnection => {
-                app.status = ViewerAppStatus::Reconnecting;
-                debug!("Trying to reconnect...");
-                drop(rx);
-                rx = reconnect(&options.custom_tty);
-                debug!("Reconnected successfully!");
-            },
-            _ => {}
+        if let ViewerAppStatus::NeedsReconnection = app.status {
+            app.status = ViewerAppStatus::Reconnecting;
+            debug!("Trying to reconnect...");
+            drop(rx);
+            rx = reconnect(&options.custom_tty);
+            debug!("Reconnected successfully!");
         }
 
         let mut maybe_state = match rx.iter().next() {
@@ -155,8 +152,8 @@ pub fn start_gui(mut rx: crossbeam_channel::Receiver<B0xxMessage>, options: View
         // Window event processing
         events_loop.poll_events(|event| pending_events.push(event));
         for event in pending_events.drain(..) {
-            match &event {
-                glium::glutin::Event::WindowEvent { event, .. } => match event {
+            if let glium::glutin::Event::WindowEvent { event, .. } = &event {
+                match event {
                     // Exit the program upon pressing `Escape`.
                     glium::glutin::WindowEvent::CloseRequested
                     | glium::glutin::WindowEvent::KeyboardInput {
@@ -168,8 +165,7 @@ pub fn start_gui(mut rx: crossbeam_channel::Receiver<B0xxMessage>, options: View
                         ..
                     } => break 'main,
                     _ => (),
-                },
-                _ => (),
+                }
             }
         }
 
