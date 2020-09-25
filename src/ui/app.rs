@@ -22,6 +22,7 @@ impl ViewerAppStatus {
     }
 }
 
+#[cfg_attr(not(feature = "fps"), derive(Clone))]
 pub struct ViewerApp {
     pub state: B0xxState,
     pub status: ViewerAppStatus,
