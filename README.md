@@ -21,7 +21,7 @@ Download the executable, and launch it through a terminal.
 Try launching the executable with `--help` to get all the current options
 
 ```text
-b0xx_viewer 0.3.0
+b0xx_viewer 0.4.0
 Mathieu Amiot <amiot.mathieu@gmail.com>
 GUI Viewer for B0XX controllers; particularly useful for streaming
 

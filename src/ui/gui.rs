@@ -384,9 +384,45 @@ pub fn render_gui(
     }
 
     // TODO: Mod LS / MS buttons
-    /* if options.is_r2_b0xx {
+    if options.is_r2_b0xx {
+        let (btn, mut m_text) = make_button(
+            app.state.mod_ls,
+            ids.frame,
+            options.button_active_colors.mod_ls,
+            options.button_inactive_colors.mod_ls,
+            options.display_labels,
+        );
 
-    }*/
+        btn
+            .x_y_relative_to(ids.y_btn, 45., -5.)
+            .set(ids.mod_ls_btn, ui);
+
+        if let Some(text_color) = m_text.take() {
+            conrod_core::widget::Text::new("LS")
+                .color(text_color)
+                .mid_top_with_margin_on(ids.mod_ls_btn, btn_label_margin)
+                .set(ids.mod_ls_label, ui);
+        }
+
+        let (btn, mut m_text) = make_button(
+            app.state.mod_ms,
+            ids.frame,
+            options.button_active_colors.mod_ms,
+            options.button_inactive_colors.mod_ms,
+            options.display_labels,
+        );
+
+        btn
+            .x_y_relative_to(ids.mod_ls_btn, 45., -15.)
+            .set(ids.mod_ms_btn, ui);
+
+        if let Some(text_color) = m_text.take() {
+            conrod_core::widget::Text::new("MS")
+                .color(text_color)
+                .mid_top_with_margin_on(ids.mod_ms_btn, btn_label_margin)
+                .set(ids.mod_ms_label, ui);
+        }
+    }
 
     fps_counter(ui, ids, app);
 }

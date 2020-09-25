@@ -1,6 +1,6 @@
 [package]
 name = "b0xx-viewer-rs"
-version = "0.3.1"
+version = "0.4.0"
 authors = ["Mathieu Amiot <amiot.mathieu@gmail.com>"]
 description = "GUI Viewer for B0XX controllers; particularly useful for streaming"
 edition = "2018"

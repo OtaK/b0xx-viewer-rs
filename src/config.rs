@@ -87,6 +87,8 @@ pub struct ViewerButtonColors {
     pub c_right: ViewerColor,
     pub c_up: ViewerColor,
     pub c_down: ViewerColor,
+    pub mod_ls: ViewerColor,
+    pub mod_ms: ViewerColor,
 }
 
 impl ViewerButtonColors {
@@ -110,6 +112,8 @@ impl ViewerButtonColors {
             c_right: color,
             c_up: color,
             c_down: color,
+            mod_ls: color,
+            mod_ms: color,
         }
     }
 }
