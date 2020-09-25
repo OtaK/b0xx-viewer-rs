@@ -7,8 +7,7 @@ use self::{app::*, support::*};
 use crate::{config::ViewerOptions, serial_probe::*};
 
 use conrod_core::widget_ids;
-use conrod_glium::Renderer;
-use glium::Surface;
+use conrod_glium::{glium::{self, Surface}, Renderer};
 
 const ALATA_FONT: &[u8] = include_bytes!("../../assets/fonts/Alata-Regular.ttf");
 
@@ -70,13 +69,13 @@ widget_ids! {
 
 pub fn start_gui(mut rx: crossbeam_channel::Receiver<B0xxMessage>, options: ViewerOptions) {
     // Build the window.
-    let mut events_loop = glium::glutin::EventsLoop::new();
+    let mut events_loop = glium::glutin::event_loop::EventLoop::new();
 
-    let window = glium::glutin::WindowBuilder::new()
+    let window = glium::glutin::window::WindowBuilder::new()
         .with_decorations(!options.chromeless.unwrap_or_default())
         .with_title(WIN_TITLE)
         .with_resizable(false)
-        .with_dimensions((WIN_W, WIN_H).into());
+        .with_inner_size::<glium::glutin::dpi::PhysicalSize<u32>>((WIN_W, WIN_H).into());
 
     let context = glium::glutin::ContextBuilder::new()
         .with_vsync(true)
@@ -110,7 +109,7 @@ pub fn start_gui(mut rx: crossbeam_channel::Receiver<B0xxMessage>, options: View
 
     let mut renderer = Renderer::new(&display).unwrap();
 
-    let mut pending_events = Vec::new();
+    let (glutin_tx, glutin_rx) = crossbeam_channel::bounded::<()>(1);
 
     'main: loop {
         // Reconnect to the device if needed
@@ -154,23 +153,31 @@ pub fn start_gui(mut rx: crossbeam_channel::Receiver<B0xxMessage>, options: View
         }
 
         // Window event processing
-        events_loop.poll_events(|event| pending_events.push(event));
-        for event in pending_events.drain(..) {
-            if let glium::glutin::Event::WindowEvent { event, .. } = &event {
-                match event {
+        use glium::glutin::platform::desktop::EventLoopExtDesktop as _;
+        events_loop.run_return(|event, _target, control_flow| {
+            match event {
+                glium::glutin::event::Event::WindowEvent { event, .. } => match event {
                     // Exit the program upon pressing `Escape`.
-                    glium::glutin::WindowEvent::CloseRequested
-                    | glium::glutin::WindowEvent::KeyboardInput {
+                    glium::glutin::event::WindowEvent::CloseRequested
+                    | glium::glutin::event::WindowEvent::KeyboardInput {
                         input:
-                            glium::glutin::KeyboardInput {
-                                virtual_keycode: Some(glium::glutin::VirtualKeyCode::Escape),
+                            glium::glutin::event::KeyboardInput {
+                                virtual_keycode: Some(glium::glutin::event::VirtualKeyCode::Escape),
                                 ..
                             },
                         ..
-                    } => break 'main,
-                    _ => (),
-                }
+                    } => {
+                        let _ = glutin_tx.send(());
+                    },
+                    _ => {},
+                },
+                _ => {},
             }
+            *control_flow = glium::glutin::event_loop::ControlFlow::Exit;
+        });
+
+        if let Ok(_) = glutin_rx.try_recv() {
+            break 'main;
         }
 
         // Instantiate the b0xx viewer GUI

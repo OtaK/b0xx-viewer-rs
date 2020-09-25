@@ -1,2 +1,3 @@
-/target
+target
+conrod_glium/Cargo.lock
 **/*.rs.bk

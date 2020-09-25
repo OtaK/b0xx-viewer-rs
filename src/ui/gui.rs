@@ -383,8 +383,7 @@ pub fn render_gui(
             .set(ids.c_down_label, ui);
     }
 
-    // TODO: Mod LS / MS buttons
-    if options.is_r2_b0xx {
+    if options.is_r2_b0xx.unwrap_or_default() {
         let (btn, mut m_text) = make_button(
             app.state.mod_ls,
             ids.frame,

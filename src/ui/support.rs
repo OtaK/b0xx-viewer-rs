@@ -8,20 +8,22 @@ pub const WIN_TITLE: &str = "B0XX Input Viewer - by @OtaK_";
 #[cfg(feature = "fake_serial")]
 pub const WIN_TITLE: &str = "B0XX Input Viewer - by @OtaK_ [FAKE SERIAL MODE]";
 
+use conrod_glium::glium;
+
 pub struct GliumDisplayWinitWrapper(pub glium::Display);
 
 impl conrod_winit::WinitWindow for GliumDisplayWinitWrapper {
     fn get_inner_size(&self) -> Option<(u32, u32)> {
-        (**self.0.gl_window())
-            // TODO: Upgrade to Glium/Glutin's new versions and switch out this code for it to work
-            //.window()
-            .get_inner_size()
-            .map(Into::into)
+        let phys_size = (**self.0.gl_window())
+            .window()
+            .inner_size();
+
+        Some((phys_size.width, phys_size.height))
     }
     fn hidpi_factor(&self) -> f32 {
         (**self.0.gl_window())
-            //.window()
-            .get_hidpi_factor() as _
+            .window()
+            .scale_factor() as _
     }
 }
 
