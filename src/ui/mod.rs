@@ -7,7 +7,10 @@ use self::{app::*, support::*};
 use crate::{config::ViewerOptions, serial_probe::*};
 
 use conrod_core::widget_ids;
-use conrod_glium::{glium::{self, Surface}, Renderer};
+use conrod_glium::{
+    glium::{self, Surface},
+    Renderer,
+};
 
 const ALATA_FONT: &[u8] = include_bytes!("../../assets/fonts/Alata-Regular.ttf");
 
@@ -72,7 +75,7 @@ pub fn start_gui(mut rx: crossbeam_channel::Receiver<B0xxMessage>, options: View
     let mut events_loop = glium::glutin::event_loop::EventLoop::new();
 
     let window = glium::glutin::window::WindowBuilder::new()
-        .with_decorations(!options.chromeless.unwrap_or_default())
+        .with_decorations(!options.chromeless)
         .with_title(WIN_TITLE)
         .with_resizable(false)
         .with_inner_size::<glium::glutin::dpi::PhysicalSize<u32>>((WIN_W, WIN_H).into());
@@ -168,10 +171,10 @@ pub fn start_gui(mut rx: crossbeam_channel::Receiver<B0xxMessage>, options: View
                         ..
                     } => {
                         let _ = glutin_tx.send(());
-                    },
-                    _ => {},
+                    }
+                    _ => {}
                 },
-                _ => {},
+                _ => {}
             }
             *control_flow = glium::glutin::event_loop::ControlFlow::Exit;
         });

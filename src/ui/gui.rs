@@ -1,5 +1,5 @@
 use super::{app::*, Ids};
-use crate::config::ViewerOptions;
+use crate::config::{ViewerColor, ViewerColorType, ViewerOptions};
 use crate::ui::support::{BTN_RADIUS, WIN_H, WIN_W};
 
 pub fn theme() -> conrod_core::Theme {
@@ -33,7 +33,7 @@ pub fn render_gui(
     use conrod_core::{widget, Colorable, Positionable, Sizeable, Widget};
 
     // Compute button margin only if necessary
-    let btn_label_margin = if options.display_labels.unwrap_or_default() {
+    let btn_label_margin = if options.display_labels {
         BTN_RADIUS / 2. - ui.theme().font_size_small as f64 + 1.
     } else {
         0.
@@ -383,7 +383,7 @@ pub fn render_gui(
             .set(ids.c_down_label, ui);
     }
 
-    if options.is_r2_b0xx.unwrap_or_default() {
+    if options.is_r2_b0xx {
         let (btn, mut m_text) = make_button(
             app.state.mod_ls,
             ids.frame,
@@ -392,8 +392,7 @@ pub fn render_gui(
             options.display_labels,
         );
 
-        btn
-            .x_y_relative_to(ids.y_btn, 45., -5.)
+        btn.x_y_relative_to(ids.y_btn, 45., -5.)
             .set(ids.mod_ls_btn, ui);
 
         if let Some(text_color) = m_text.take() {
@@ -411,8 +410,7 @@ pub fn render_gui(
             options.display_labels,
         );
 
-        btn
-            .x_y_relative_to(ids.mod_ls_btn, 45., -15.)
+        btn.x_y_relative_to(ids.mod_ls_btn, 45., -15.)
             .set(ids.mod_ms_btn, ui);
 
         if let Some(text_color) = m_text.take() {
@@ -447,7 +445,7 @@ fn make_button(
     parent: conrod_core::widget::Id,
     active_color: crate::config::ViewerColor,
     inactive_color: crate::config::ViewerColor,
-    display_labels: Option<bool>,
+    display_labels: bool,
 ) -> (
     conrod_core::widget::Oval<conrod_core::widget::primitive::shape::oval::Full>,
     Option<conrod_core::Color>,
@@ -455,7 +453,7 @@ fn make_button(
     use conrod_core::{widget, Colorable, Sizeable, Widget};
 
     let color = if state { active_color } else { inactive_color };
-    let text_color = if display_labels.unwrap_or_default() {
+    let text_color = if display_labels {
         let tmp: conrod_core::Color = color.clone().into();
         Some(tmp.plain_contrast())
     } else {

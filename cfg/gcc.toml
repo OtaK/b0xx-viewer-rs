@@ -76,6 +76,16 @@ r = 85
 g = 87
 b = 83
 
+[button_inactive_colors.mod_ls]
+r = 85
+g = 87
+b = 83
+
+[button_inactive_colors.mod_ms]
+r = 85
+g = 87
+b = 83
+
 [button_inactive_colors.c_left]
 r = 221
 g = 203
@@ -162,6 +172,16 @@ g = 235
 b = 255
 
 [button_active_colors.mod_y]
+r = 0
+g = 235
+b = 255
+
+[button_active_colors.mod_ls]
+r = 0
+g = 235
+b = 255
+
+[button_active_colors.mod_ms]
 r = 0
 g = 235
 b = 255

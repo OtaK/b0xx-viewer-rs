@@ -14,16 +14,12 @@ pub struct GliumDisplayWinitWrapper(pub glium::Display);
 
 impl conrod_winit::WinitWindow for GliumDisplayWinitWrapper {
     fn get_inner_size(&self) -> Option<(u32, u32)> {
-        let phys_size = (**self.0.gl_window())
-            .window()
-            .inner_size();
+        let phys_size = (**self.0.gl_window()).window().inner_size();
 
         Some((phys_size.width, phys_size.height))
     }
     fn hidpi_factor(&self) -> f32 {
-        (**self.0.gl_window())
-            .window()
-            .scale_factor() as _
+        (**self.0.gl_window()).window().scale_factor() as _
     }
 }
 

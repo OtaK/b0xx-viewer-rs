@@ -46,15 +46,15 @@ pub fn cli_options() -> ViewerOptions {
     };
 
     if matches.is_present("labels") {
-        ret.display_labels = Some(true);
+        ret.display_labels = true;
     }
 
     if matches.is_present("chromeless") {
-        ret.chromeless = Some(true);
+        ret.chromeless = true;
     }
 
     if matches.is_present("r2") {
-        ret.is_r2_b0xx = Some(true);
+        ret.is_r2_b0xx = true;
     }
 
     if let Some(tty) = matches.value_of("tty").take() {
