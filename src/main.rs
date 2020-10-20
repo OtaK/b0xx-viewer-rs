@@ -1,4 +1,5 @@
 #![cfg_attr(not(feature = "win_console"), windows_subsystem = "windows")]
+#![forbid(unsafe_code)]
 
 #[macro_use]
 extern crate log;

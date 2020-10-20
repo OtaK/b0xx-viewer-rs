@@ -144,7 +144,6 @@ dependencies = [
  "pretty_env_logger",
  "rand",
  "rgb",
- "rusttype 0.8.3",
  "serde",
  "serialport",
  "thiserror",

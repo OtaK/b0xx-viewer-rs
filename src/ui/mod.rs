@@ -75,8 +75,8 @@ pub fn start_gui(mut rx: crossbeam_channel::Receiver<B0xxMessage>, options: View
     let window = glium::glutin::window::WindowBuilder::new()
         .with_decorations(!options.chromeless)
         .with_title(WIN_TITLE)
-        .with_resizable(false)
-        .with_inner_size::<glium::glutin::dpi::PhysicalSize<u32>>((WIN_W, WIN_H).into());
+        .with_resizable(true);
+        //.with_inner_size::<glium::glutin::dpi::PhysicalSize<u32>>((WIN_W, WIN_H).into());
 
     let context = glium::glutin::ContextBuilder::new()
         .with_vsync(true)
@@ -95,9 +95,11 @@ pub fn start_gui(mut rx: crossbeam_channel::Receiver<B0xxMessage>, options: View
         .theme(gui::theme())
         .build();
 
+    ui.set_num_redraw_frames(1);
+
     let alata_font = ui
         .fonts
-        .insert(rusttype::Font::from_bytes(ALATA_FONT).unwrap());
+        .insert(conrod_core::text::Font::from_bytes(ALATA_FONT).unwrap());
 
     ui.theme.font_id = Some(alata_font);
 
@@ -169,7 +171,11 @@ pub fn start_gui(mut rx: crossbeam_channel::Receiver<B0xxMessage>, options: View
                         ..
                     } => {
                         let _ = glutin_tx.send(());
-                    }
+                    },
+                    glium::glutin::event::WindowEvent::Resized(size) => {
+                        ui.win_h = size.height.into();
+                        ui.win_w = size.width.into();
+                    },
                     _ => {}
                 },
                 _ => {}

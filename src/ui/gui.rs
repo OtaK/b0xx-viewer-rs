@@ -31,17 +31,21 @@ pub fn render_gui(
     options: &ViewerOptions,
 ) {
     use conrod_core::{widget, Colorable, Positionable, Sizeable, Widget};
+    let [cur_w, cur_h] = ui.window_dim();
+    let scale_factor = (cur_w + cur_h) / ((WIN_W + WIN_H) as f64);
 
     // Compute button margin only if necessary
     let btn_label_margin = if options.display_labels {
         BTN_RADIUS / 2. - ui.theme().font_size_small as f64 + 1.
     } else {
         0.
-    };
+    } * scale_factor;
+
+    // TODO: Find out a way to scale the UI elements from the current window size
 
     widget::Canvas::new()
         .color(options.background_color.into())
-        .w_h(WIN_W.into(), WIN_H.into())
+        .w_h(cur_w, cur_h)
         .x_y(0., 0.)
         .crop_kids()
         .set(ids.frame, ui);
@@ -50,10 +54,10 @@ pub fn render_gui(
         || app.status == ViewerAppStatus::NeedsReconnection
     {
         conrod_core::widget::Rectangle::fill_with(
-            [WIN_W.into(), WIN_H.into()],
+            [cur_w, cur_h],
             conrod_core::color::BLACK.with_alpha(0.8),
         )
-        .w_h(WIN_W.into(), WIN_H.into())
+        .w_h(cur_w, cur_h)
         .x_y(0., 0.)
         .crop_kids()
         .set(ids.reconnect_bg, ui);
