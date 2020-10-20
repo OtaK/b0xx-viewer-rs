@@ -7,10 +7,8 @@ use self::{app::*, support::*};
 use crate::{config::ViewerOptions, serial_probe::*};
 
 use conrod_core::widget_ids;
-use conrod_glium::{
-    glium::{self, Surface},
-    Renderer,
-};
+use glium::{self, Surface};
+use conrod_glium::Renderer;
 
 const ALATA_FONT: &[u8] = include_bytes!("../../assets/fonts/Alata-Regular.ttf");
 
@@ -19,7 +17,7 @@ use conrod_winit::{
     convert_event, convert_key, convert_mouse_button, convert_mouse_cursor, convert_window_event,
 };
 
-conrod_winit::v021_conversion_fns!();
+conrod_winit::v023_conversion_fns!();
 
 widget_ids! {
     pub struct Ids {
