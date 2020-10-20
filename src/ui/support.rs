@@ -8,8 +8,6 @@ pub const WIN_TITLE: &str = "B0XX Input Viewer - by @OtaK_";
 #[cfg(feature = "fake_serial")]
 pub const WIN_TITLE: &str = "B0XX Input Viewer - by @OtaK_ [FAKE SERIAL MODE]";
 
-use conrod_glium::glium;
-
 pub struct GliumDisplayWinitWrapper(pub glium::Display);
 
 impl conrod_winit::WinitWindow for GliumDisplayWinitWrapper {
