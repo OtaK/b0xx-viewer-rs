@@ -1,5 +1,5 @@
 use super::{app::*, Ids};
-use crate::config::{ViewerColor, ViewerColorType, ViewerOptions};
+use crate::config::ViewerOptions;
 use crate::ui::support::{BTN_RADIUS, WIN_H, WIN_W};
 
 pub fn theme() -> conrod_core::Theme {

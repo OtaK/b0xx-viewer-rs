@@ -4,13 +4,23 @@ A multi-platform B0XX input viewer for your streaming needs
 
 ## Installation
 
-Grab the latest release on the Releases page for your platform, unzip it, and run the program from there`.
+Grab the latest release on the Releases page for your platform, and run the program from there.
 
 ## Usage
 
 ### Windows
 
 Double click on the .exe file.
+
+#### Passing arguments to a .exe file
+
+If you wish to setup your input viewer (for example) to use the `--r2` start flag, enabling B0XX r2 buttons:
+
+* Right click on the .exe file, click on "Create shortcut"
+* On the newly created shortcut, right click, go to "Properties"
+* Add the desired flags after the full executable path in the "Target" field, like so:
+
+![Properties Dialog](/assets/win_properties_dialog.png)
 
 ### Linux and macOS
 
@@ -19,9 +29,10 @@ Download the executable, and launch it through a terminal.
 ### Options
 
 Try launching the executable with `--help` to get all the current options
+Note: This will not work on Windows because of platform restrictions
 
 ```text
-b0xx_viewer 0.4.0
+b0xx_viewer 0.4.1
 Mathieu Amiot <amiot.mathieu@gmail.com>
 GUI Viewer for B0XX controllers; particularly useful for streaming
 
@@ -56,8 +67,8 @@ You can create your own configuration file by launching the program with the `--
 
 Prequisites:
 
-- Rust
-- Linux-only: `libudev-dev`, `libxcb-shape0-dev`, `libxcb-xfixes0-dev`
+* Rust
+* Linux-only: `libudev-dev`, `libxcb-shape0-dev`, `libxcb-xfixes0-dev`
 
 Just `cargo build --release` and you should be good to go
 
@@ -83,5 +94,5 @@ Well, it's a, uh, FPS counter.
 
 ## Authors
 
-- Mathieu "OtaK_" Amiot
-- 20XX Inc. - Makers of the B0XX
+* Mathieu "OtaK_" Amiot
+* 20XX Inc. - Makers of the B0XX
