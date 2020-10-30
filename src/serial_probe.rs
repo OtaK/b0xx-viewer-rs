@@ -69,8 +69,6 @@ pub fn reconnect(custom_tty: &Option<String>) -> crossbeam_channel::Receiver<B0x
 pub fn start_serial_probe(
     custom_tty: &Option<String>,
 ) -> Result<crossbeam_channel::Receiver<B0xxMessage>, ViewerError> {
-    use std::io::Read;
-
     let b0xx_port = serialport::available_ports()?
         .into_iter()
         .find(move |port| {
@@ -113,10 +111,11 @@ pub fn start_serial_probe(
     };
 
     let (tx, rx) = crossbeam_channel::bounded(1);
+
     std::thread::Builder::new()
         .name("b0xx_viewer_serial".into())
         .spawn(move || {
-            let mut buf = [0u8; 25];
+            let mut buf = Vec::with_capacity(25);
             let mut state = [B0xxReport::default(); 20];
 
             let mut port =
@@ -125,37 +124,20 @@ pub fn start_serial_probe(
                     Err(e) => return tx.send(B0xxMessage::Error(e.into())),
                 };
 
-            // Exhaust the initial buffer till we find the end of a report and consume it.
-            // This is caused by a UB in Windows' COM port handling causing partial reports
-            // sometimes
-            debug!("Buffer exhaustion started");
-            let mut exhaust_buffer = [0u8; 1];
+
+            exhaust_buffer(&mut port, &tx);
+
+            let mut port = std::io::BufReader::with_capacity(25, port);
+
+            use std::io::BufRead as _;
             loop {
-                if let Err(e) = port
-                    .read_exact(&mut exhaust_buffer)
-                    .map_err(ViewerError::from)
-                {
-                    error!("{:?}", e);
-                    return tx.send(B0xxMessage::Quit);
+                if let Err(e) = port.get_mut().write_request_to_send(true) {
+                    return tx.send(B0xxMessage::Error(e.into()));
                 }
 
-                if exhaust_buffer[0] == B0xxReport::End as u8 {
-                    debug!("Buffer exhausted successfully, continuing...");
-                    break;
-                }
-            }
-
-            if let Err(e) = port.clear(serialport::ClearBuffer::All) {
-                return tx.send(B0xxMessage::Error(e.into()));
-            }
-
-            if let Err(e) = port.write_request_to_send(true) {
-                return tx.send(B0xxMessage::Error(e.into()));
-            }
-
-            loop {
-                if let Err(e) = port.read_exact(&mut buf).map_err(Into::into) {
-                    match &e {
+                let bytes_read: usize = match port.read_until(B0xxReport::End as u8, &mut buf).map_err(Into::into) {
+                    Ok(bytes) => bytes,
+                    Err(e) => match &e {
                         ViewerError::IoError(io_error) => match io_error.kind() {
                             std::io::ErrorKind::TimedOut | std::io::ErrorKind::BrokenPipe => {
                                 return tx.send(B0xxMessage::Reconnect);
@@ -170,12 +152,28 @@ pub fn start_serial_probe(
                             return tx.send(B0xxMessage::Quit);
                         }
                     }
+                };
+
+                if let Err(e) = port.get_mut().write_request_to_send(false) {
+                    return tx.send(B0xxMessage::Error(e.into()));
                 }
 
-                for (i, a) in buf.iter_mut().take(20).enumerate() {
-                    state[i] = (*a).into();
-                    *a = 0;
+                debug!("Bytes read: {}", bytes_read);
+
+                port.consume(bytes_read);
+                if bytes_read == 25 {
+                    let end_index = buf.iter().position(|item| *item == B0xxReport::End as u8).unwrap() - 4;
+                    let start_index = end_index - 20;
+                    debug!("Selected range: {}..{}", start_index, end_index);
+
+                    for i in start_index..end_index {
+                        state[i] = buf[i].into();
+                    }
+                } else {
+                    exhaust_buffer(port.get_mut(), &tx);
                 }
+
+                buf.clear();
 
                 if tx.send(B0xxMessage::State(state.into())).is_err() {
                     info!("Reconnection detected, exiting runloop");
@@ -200,4 +198,33 @@ pub fn start_serial_probe(
     });
 
     Ok(rx)
+}
+
+#[inline(always)]
+fn exhaust_buffer(port: &mut Box<dyn serialport::SerialPort>, tx: &crossbeam_channel::Sender<B0xxMessage>) {
+    // Exhaust the initial buffer till we find the end of a report and consume it.
+    // This is caused by a UB in Windows' COM port handling causing partial reports
+    // sometimes
+    debug!("Buffer exhaustion started");
+    let mut exhaust_buffer = [0u8; 1];
+    use std::io::Read as _;
+    loop {
+        if let Err(e) = port
+            .read_exact(&mut exhaust_buffer)
+            .map_err(ViewerError::from)
+        {
+            error!("{:?}", e);
+            let _ = tx.send(B0xxMessage::Quit);
+            break;
+        }
+
+        if exhaust_buffer[0] == B0xxReport::End as u8 {
+            debug!("Buffer exhausted successfully, continuing...");
+            break;
+        }
+    }
+
+    if let Err(e) = port.clear(serialport::ClearBuffer::All) {
+        let _ = tx.send(B0xxMessage::Error(e.into()));
+    }
 }
