@@ -95,6 +95,8 @@ pub fn start_gui(mut rx: crossbeam_channel::Receiver<B0xxMessage>, options: View
         .theme(gui::theme())
         .build();
 
+    ui.set_num_redraw_frames(1);
+
     let alata_font = ui
         .fonts
         .insert(rusttype::Font::from_bytes(ALATA_FONT).unwrap());
@@ -114,7 +116,7 @@ pub fn start_gui(mut rx: crossbeam_channel::Receiver<B0xxMessage>, options: View
 
     'main: loop {
         // Reconnect to the device if needed
-        if let ViewerAppStatus::NeedsReconnection = app.status {
+        if app.status == ViewerAppStatus::NeedsReconnection {
             app.status = ViewerAppStatus::Reconnecting;
             debug!("Trying to reconnect...");
             drop(rx);
@@ -155,7 +157,7 @@ pub fn start_gui(mut rx: crossbeam_channel::Receiver<B0xxMessage>, options: View
 
         // Window event processing
         use glium::glutin::platform::desktop::EventLoopExtDesktop as _;
-        events_loop.run_return(|event, _target, control_flow| {
+        events_loop.run_return(|event, _, control_flow| {
             match event {
                 glium::glutin::event::Event::WindowEvent { event, .. } => match event {
                     // Exit the program upon pressing `Escape`.
