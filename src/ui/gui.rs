@@ -34,7 +34,7 @@ pub fn render_gui(
 
     // Compute button margin only if necessary
     let btn_label_margin = if options.display_labels {
-        BTN_RADIUS / 2. - ui.theme().font_size_small as f64 + 1.
+        BTN_RADIUS / 2. - ui.theme().font_size_small as f64
     } else {
         0.
     };
@@ -89,7 +89,7 @@ pub fn render_gui(
         options.display_labels,
     );
 
-    btn.x_y_relative_to(ids.start_btn, -100., 5.)
+    btn.x_y_relative_to(ids.start_btn, -105., 5.)
         .set(ids.right_btn, ui);
 
     if let Some(text_color) = m_text.take() {
@@ -107,7 +107,7 @@ pub fn render_gui(
         options.display_labels,
     );
 
-    btn.x_y_relative_to(ids.right_btn, -45., 15.)
+    btn.x_y_relative_to(ids.right_btn, -42., 15.)
         .set(ids.down_btn, ui);
 
     if let Some(text_color) = m_text.take() {
@@ -143,7 +143,7 @@ pub fn render_gui(
         options.display_labels,
     );
 
-    btn.x_y_relative_to(ids.left_btn, -45., -15.)
+    btn.x_y_relative_to(ids.left_btn, -40., -22.)
         .set(ids.l_btn, ui);
 
     if let Some(text_color) = m_text.take() {
@@ -161,7 +161,7 @@ pub fn render_gui(
         options.display_labels,
     );
 
-    btn.x_y_relative_to(ids.right_btn, 10., -120.)
+    btn.x_y_relative_to(ids.right_btn, 5., -90.)
         .set(ids.mod_x_btn, ui);
 
     if let Some(text_color) = m_text.take() {
@@ -179,7 +179,7 @@ pub fn render_gui(
         options.display_labels,
     );
 
-    btn.x_y_relative_to(ids.mod_x_btn, 40., -20.)
+    btn.x_y_relative_to(ids.mod_x_btn, 38., -22.)
         .set(ids.mod_y_btn, ui);
 
     if let Some(text_color) = m_text.take() {
@@ -215,7 +215,7 @@ pub fn render_gui(
         options.display_labels,
     );
 
-    btn.x_y_relative_to(ids.b_btn, 45., 15.).set(ids.x_btn, ui);
+    btn.x_y_relative_to(ids.b_btn, 42., 15.).set(ids.x_btn, ui);
 
     if let Some(text_color) = m_text.take() {
         conrod_core::widget::Text::new("X")
@@ -232,7 +232,7 @@ pub fn render_gui(
         options.display_labels,
     );
 
-    btn.x_y_relative_to(ids.x_btn, 45., -5.).set(ids.z_btn, ui);
+    btn.x_y_relative_to(ids.x_btn, 43., -5.).set(ids.z_btn, ui);
 
     if let Some(text_color) = m_text.take() {
         conrod_core::widget::Text::new("Z")
@@ -249,7 +249,7 @@ pub fn render_gui(
         options.display_labels,
     );
 
-    btn.x_y_relative_to(ids.z_btn, 45., -15.)
+    btn.x_y_relative_to(ids.z_btn, 42., -18.)
         .set(ids.up_btn, ui);
 
     if let Some(text_color) = m_text.take() {
@@ -267,7 +267,7 @@ pub fn render_gui(
         options.display_labels,
     );
 
-    btn.x_y_relative_to(ids.x_btn, 2., 45.).set(ids.y_btn, ui);
+    btn.x_y_relative_to(ids.x_btn, 0., 42.).set(ids.y_btn, ui);
 
     if let Some(text_color) = m_text.take() {
         conrod_core::widget::Text::new("Y")
@@ -284,7 +284,7 @@ pub fn render_gui(
         options.display_labels,
     );
 
-    btn.x_y_relative_to(ids.b_btn, 2., 45.).set(ids.r_btn, ui);
+    btn.x_y_relative_to(ids.b_btn, 0., 42.).set(ids.r_btn, ui);
 
     if let Some(text_color) = m_text.take() {
         conrod_core::widget::Text::new("R")
@@ -301,7 +301,7 @@ pub fn render_gui(
         options.display_labels,
     );
 
-    btn.x_y_relative_to(ids.b_btn, -10., -120.)
+    btn.x_y_relative_to(ids.b_btn, -10., -100.)
         .set(ids.a_btn, ui);
 
     if let Some(text_color) = m_text.take() {
@@ -392,7 +392,7 @@ pub fn render_gui(
             options.display_labels,
         );
 
-        btn.x_y_relative_to(ids.y_btn, 45., -5.)
+        btn.x_y_relative_to(ids.y_btn, 43., -5.)
             .set(ids.mod_ls_btn, ui);
 
         if let Some(text_color) = m_text.take() {
@@ -410,7 +410,7 @@ pub fn render_gui(
             options.display_labels,
         );
 
-        btn.x_y_relative_to(ids.mod_ls_btn, 45., -15.)
+        btn.x_y_relative_to(ids.mod_ls_btn, 40., -17.)
             .set(ids.mod_ms_btn, ui);
 
         if let Some(text_color) = m_text.take() {
