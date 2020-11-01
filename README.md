@@ -32,7 +32,7 @@ Try launching the executable with `--help` to get all the current options
 Note: This will not work on Windows because of platform restrictions
 
 ```text
-b0xx_viewer 0.4.2
+b0xx_viewer 0.4.4
 Mathieu Amiot <amiot.mathieu@gmail.com>
 GUI Viewer for B0XX controllers; particularly useful for streaming
 
@@ -49,9 +49,9 @@ FLAGS:
     -V, --version                    Prints version information
 
 OPTIONS:
-    -b, --background <bg_color>            Sets a custom background color
-    -a, --active <btn_active_color>        Sets a custom color for pressed/active buttons
-    -i, --inactive <btn_inactive_color>    Sets a custom color for inactive buttons
+    -b, --background <bg_color>            Sets a custom background color in hex format, eg. "#00FF00"
+    -a, --active <btn_active_color>        Sets a custom color for pressed/active buttons in hex format, eg. "#00FF00"
+    -i, --inactive <btn_inactive_color>    Sets a custom color for inactive buttons in hex format, eg. "#00FF00"
     -c, --config <config>                  Sets the configuration file path
         --tty <tty>                        Provide a custom COM port (Windows-only) or a /dev/ttyXXX path (Unix).
                                            Bypasses auto-detection, so proceed at your own risk!
