@@ -32,7 +32,7 @@ Try launching the executable with `--help` to get all the current options
 Note: This will not work on Windows because of platform restrictions
 
 ```text
-b0xx_viewer 0.4.4
+b0xx_viewer 0.4.5
 Mathieu Amiot <amiot.mathieu@gmail.com>
 GUI Viewer for B0XX controllers; particularly useful for streaming
 
