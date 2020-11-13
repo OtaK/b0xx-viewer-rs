@@ -17,7 +17,6 @@ path = "src/main.rs"
 
 [dependencies]
 serialport = "3.3"
-pretty_env_logger = "0.4"
 log = "0.4"
 rand = { version = "0.7", optional = true }
 conrod_core = "0.71"
@@ -35,7 +34,9 @@ toml = "0.5"
 rgb = { version = "0.8", features = ["serde"] }
 anyhow = "1.0"
 thiserror = "1.0"
-backoff = "0.2.1"
+backoff = "0.2"
+fern = { version = "0.6", features = ["colored"] }
+chrono = "0.4.19"
 
 [target.'cfg(windows)'.build-dependencies]
 winres = "0.1"

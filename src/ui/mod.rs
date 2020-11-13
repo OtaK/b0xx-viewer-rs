@@ -127,7 +127,6 @@ pub fn start_gui(mut rx: crossbeam_channel::Receiver<B0xxMessage>, options: View
         let mut maybe_state = match rx.iter().next() {
             Some(message) => match message {
                 B0xxMessage::State(state) => {
-                    trace!("{:#?}", state);
                     app.status.set_running();
                     Some(state)
                 }
