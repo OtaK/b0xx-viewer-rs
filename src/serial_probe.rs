@@ -158,13 +158,13 @@ pub fn start_serial_probe(
                     return tx.send(B0xxMessage::Error(e.into()));
                 }
 
-                debug!("Bytes read: {}", bytes_read);
+                trace!("Bytes read: {}", bytes_read);
 
                 port.consume(bytes_read);
                 if bytes_read == 25 {
                     let end_index = buf.iter().position(|item| *item == B0xxReport::End as u8).unwrap() - 4;
                     let start_index = end_index - 20;
-                    debug!("Selected range: {}..{}", start_index, end_index);
+                    trace!("Selected range: {}..{}", start_index, end_index);
 
                     for i in start_index..end_index {
                         state[i] = buf[i].into();
@@ -200,12 +200,13 @@ pub fn start_serial_probe(
     Ok(rx)
 }
 
+#[allow(dead_code)]
 #[inline(always)]
 fn exhaust_buffer(port: &mut Box<dyn serialport::SerialPort>, tx: &crossbeam_channel::Sender<B0xxMessage>) {
     // Exhaust the initial buffer till we find the end of a report and consume it.
     // This is caused by a UB in Windows' COM port handling causing partial reports
     // sometimes
-    debug!("Buffer exhaustion started");
+    trace!("Buffer exhaustion started");
     let mut exhaust_buffer = [0u8; 1];
     use std::io::Read as _;
     loop {
@@ -219,7 +220,7 @@ fn exhaust_buffer(port: &mut Box<dyn serialport::SerialPort>, tx: &crossbeam_cha
         }
 
         if exhaust_buffer[0] == B0xxReport::End as u8 {
-            debug!("Buffer exhausted successfully, continuing...");
+            trace!("Buffer exhausted successfully, continuing...");
             break;
         }
     }

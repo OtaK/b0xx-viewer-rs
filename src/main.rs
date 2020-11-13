@@ -10,6 +10,7 @@ mod config;
 mod error;
 mod serial_probe;
 mod ui;
+mod logger;
 
 pub use self::error::*;
 
@@ -20,7 +21,8 @@ pub fn main() {
         std::env::set_var("RUST_LOG", "b0xx_viewer=info");
     }
 
-    pretty_env_logger::init();
+    let mut logger = logger::Logger::new();
+    logger.init();
 
     let options = cli::cli_options();
 

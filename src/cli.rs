@@ -96,7 +96,7 @@ pub fn cli_options() -> ViewerOptions {
         ret.button_active_colors = ViewerButtonColors::new_with_color(hex_to_color!(bg));
     }
 
-    debug!("Configuration: {:#?}", ret);
+    trace!("Configuration: {:#?}", ret);
 
     ret
 }
