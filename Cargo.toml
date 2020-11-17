@@ -1,6 +1,6 @@
 [package]
 name = "b0xx-viewer-rs"
-version = "0.4.5"
+version = "0.4.6"
 authors = ["Mathieu Amiot <amiot.mathieu@gmail.com>"]
 description = "GUI Viewer for B0XX controllers; particularly useful for streaming"
 edition = "2018"
@@ -36,7 +36,7 @@ anyhow = "1.0"
 thiserror = "1.0"
 backoff = "0.2"
 fern = { version = "0.6", features = ["colored"] }
-chrono = "0.4.19"
+chrono = "0.4"
 
 [target.'cfg(windows)'.build-dependencies]
 winres = "0.1"
