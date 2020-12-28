@@ -69,7 +69,9 @@ pub fn render_gui(
         ids.frame,
         options.button_active_colors.start,
         options.button_inactive_colors.start,
+        options.background_color,
         options.display_labels,
+        options.colored_rims,
     );
 
     btn.x_y(0., 40.).set(ids.start_btn, ui);
@@ -86,7 +88,9 @@ pub fn render_gui(
         ids.frame,
         options.button_active_colors.right,
         options.button_inactive_colors.right,
+        options.background_color,
         options.display_labels,
+        options.colored_rims,
     );
 
     btn.x_y_relative_to(ids.start_btn, -105., 5.)
@@ -104,7 +108,9 @@ pub fn render_gui(
         ids.frame,
         options.button_active_colors.down,
         options.button_inactive_colors.down,
+        options.background_color,
         options.display_labels,
+        options.colored_rims,
     );
 
     btn.x_y_relative_to(ids.right_btn, -42., 15.)
@@ -122,7 +128,9 @@ pub fn render_gui(
         ids.frame,
         options.button_active_colors.left,
         options.button_inactive_colors.left,
+        options.background_color,
         options.display_labels,
+        options.colored_rims,
     );
 
     btn.x_y_relative_to(ids.down_btn, -45., -5.)
@@ -140,7 +148,9 @@ pub fn render_gui(
         ids.frame,
         options.button_active_colors.l,
         options.button_inactive_colors.l,
+        options.background_color,
         options.display_labels,
+        options.colored_rims,
     );
 
     btn.x_y_relative_to(ids.left_btn, -40., -22.)
@@ -158,7 +168,9 @@ pub fn render_gui(
         ids.frame,
         options.button_active_colors.mod_x,
         options.button_inactive_colors.mod_x,
+        options.background_color,
         options.display_labels,
+        options.colored_rims,
     );
 
     btn.x_y_relative_to(ids.right_btn, 5., -90.)
@@ -176,7 +188,9 @@ pub fn render_gui(
         ids.frame,
         options.button_active_colors.mod_y,
         options.button_inactive_colors.mod_y,
+        options.background_color,
         options.display_labels,
+        options.colored_rims,
     );
 
     btn.x_y_relative_to(ids.mod_x_btn, 38., -22.)
@@ -194,7 +208,9 @@ pub fn render_gui(
         ids.frame,
         options.button_active_colors.b,
         options.button_inactive_colors.b,
+        options.background_color,
         options.display_labels,
+        options.colored_rims,
     );
 
     btn.x_y_relative_to(ids.start_btn, 100., 5.)
@@ -212,7 +228,9 @@ pub fn render_gui(
         ids.frame,
         options.button_active_colors.x,
         options.button_inactive_colors.x,
+        options.background_color,
         options.display_labels,
+        options.colored_rims,
     );
 
     btn.x_y_relative_to(ids.b_btn, 42., 15.).set(ids.x_btn, ui);
@@ -229,7 +247,9 @@ pub fn render_gui(
         ids.frame,
         options.button_active_colors.z,
         options.button_inactive_colors.z,
+        options.background_color,
         options.display_labels,
+        options.colored_rims,
     );
 
     btn.x_y_relative_to(ids.x_btn, 43., -5.).set(ids.z_btn, ui);
@@ -246,7 +266,9 @@ pub fn render_gui(
         ids.frame,
         options.button_active_colors.up,
         options.button_inactive_colors.up,
+        options.background_color,
         options.display_labels,
+        options.colored_rims,
     );
 
     btn.x_y_relative_to(ids.z_btn, 42., -18.)
@@ -264,7 +286,9 @@ pub fn render_gui(
         ids.frame,
         options.button_active_colors.y,
         options.button_inactive_colors.y,
+        options.background_color,
         options.display_labels,
+        options.colored_rims,
     );
 
     btn.x_y_relative_to(ids.x_btn, 0., 42.).set(ids.y_btn, ui);
@@ -281,7 +305,9 @@ pub fn render_gui(
         ids.frame,
         options.button_active_colors.r,
         options.button_inactive_colors.r,
+        options.background_color,
         options.display_labels,
+        options.colored_rims,
     );
 
     btn.x_y_relative_to(ids.b_btn, 0., 42.).set(ids.r_btn, ui);
@@ -298,7 +324,9 @@ pub fn render_gui(
         ids.frame,
         options.button_active_colors.a,
         options.button_inactive_colors.a,
+        options.background_color,
         options.display_labels,
+        options.colored_rims,
     );
 
     btn.x_y_relative_to(ids.b_btn, -10., -100.)
@@ -316,7 +344,9 @@ pub fn render_gui(
         ids.frame,
         options.button_active_colors.c_up,
         options.button_inactive_colors.c_up,
+        options.background_color,
         options.display_labels,
+        options.colored_rims,
     );
 
     btn.x_y_relative_to(ids.a_btn, 1., 48.)
@@ -334,7 +364,9 @@ pub fn render_gui(
         ids.frame,
         options.button_active_colors.c_left,
         options.button_inactive_colors.c_left,
+        options.background_color,
         options.display_labels,
+        options.colored_rims,
     );
 
     btn.x_y_relative_to(ids.c_up_btn, -34., -24.)
@@ -352,7 +384,9 @@ pub fn render_gui(
         ids.frame,
         options.button_active_colors.c_right,
         options.button_inactive_colors.c_right,
+        options.background_color,
         options.display_labels,
+        options.colored_rims,
     );
 
     btn.x_y_relative_to(ids.c_up_btn, 34., -24.)
@@ -370,7 +404,9 @@ pub fn render_gui(
         ids.frame,
         options.button_active_colors.c_down,
         options.button_inactive_colors.c_down,
+        options.background_color,
         options.display_labels,
+        options.colored_rims,
     );
 
     btn.x_y_relative_to(ids.c_left_btn, 0., -48.)
@@ -389,7 +425,9 @@ pub fn render_gui(
             ids.frame,
             options.button_active_colors.mod_ls,
             options.button_inactive_colors.mod_ls,
+            options.background_color,
             options.display_labels,
+            options.colored_rims,
         );
 
         btn.x_y_relative_to(ids.y_btn, 43., -5.)
@@ -407,7 +445,9 @@ pub fn render_gui(
             ids.frame,
             options.button_active_colors.mod_ms,
             options.button_inactive_colors.mod_ms,
+            options.background_color,
             options.display_labels,
+            options.colored_rims,
         );
 
         btn.x_y_relative_to(ids.mod_ls_btn, 40., -17.)
@@ -441,18 +481,26 @@ fn fps_counter(ui: &mut conrod_core::UiCell, ids: &Ids, app: &mut ViewerApp) {
 
 #[inline(always)]
 fn make_button(
-    state: bool,
+    pressed: bool,
     parent: conrod_core::widget::Id,
     active_color: crate::config::ViewerColor,
     inactive_color: crate::config::ViewerColor,
+    background_color: crate::config::ViewerColor,
     display_labels: bool,
+    colored_rims: bool,
 ) -> (
     conrod_core::widget::Oval<conrod_core::widget::primitive::shape::oval::Full>,
     Option<conrod_core::Color>,
 ) {
-    use conrod_core::{widget, Colorable, Sizeable, Widget};
+    use conrod_core::{widget, Sizeable, Widget};
 
-    let color = if state { active_color } else { inactive_color };
+    let color = if pressed {
+        active_color
+    } else if colored_rims {
+        background_color
+    } else {
+        inactive_color
+    };
     let text_color = if display_labels {
         let tmp: conrod_core::Color = color.clone().into();
         Some(tmp.plain_contrast())
@@ -460,12 +508,21 @@ fn make_button(
         None
     };
 
-    (
-        widget::Circle::fill(BTN_RADIUS)
-            .color(color.into())
+    let mut widget = if colored_rims && !pressed {
+        widget::Circle::outline_styled(
+            BTN_RADIUS,
+            widget::primitive::line::Style::solid()
+                .color(inactive_color.into())
+                .thickness(2.)
+        )
+    } else {
+        widget::Circle::fill_with(BTN_RADIUS, color.into())
+    };
+
+    widget = widget
             .parent(parent)
             .graphics_for(parent)
-            .w_h(BTN_RADIUS, BTN_RADIUS),
-        text_color,
-    )
+            .w_h(BTN_RADIUS, BTN_RADIUS);
+
+    (widget, text_color)
 }

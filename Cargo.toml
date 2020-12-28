@@ -16,9 +16,9 @@ name = "b0xx_viewer"
 path = "src/main.rs"
 
 [dependencies]
-serialport = "3.3"
+serialport = "4.0"
 log = "0.4"
-rand = { version = "0.7", optional = true }
+rand = { version = "0.8", optional = true }
 conrod_core = "0.71"
 conrod_winit = "0.71"
 conrod_glium = "0.71"
@@ -45,6 +45,7 @@ winres = "0.1"
 default = []
 fake_serial = ["rand"]
 fps = ["fps_counter"]
+benchmark = ["fake_serial", "fps"]
 win_console = []
 
 [profile.release]
