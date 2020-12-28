@@ -17,6 +17,7 @@ pub fn cli_options() -> ViewerOptions {
         (@arg tty: --tty +takes_value "Provide a custom COM port (Windows-only) or a /dev/ttyXXX path (Unix). Bypasses auto-detection, so proceed at your own risk!")
         (@arg relax_arduino: --relax_arduino_detection "Relaxes B0XX detection to allow any 16MHz Arduino-compatible device to connect")
         (@arg r2: --r2 "Enables B0XX r2 mode to account for the 2 extra buttons")
+        (@arg colored_rims: --colored_rims "Enables an alternative mode of inactive button coloring; Makes inactive button background neutral in favor of button rims instead.")
     )
     .get_matches();
 
@@ -55,6 +56,10 @@ pub fn cli_options() -> ViewerOptions {
 
     if matches.is_present("r2") {
         ret.is_r2_b0xx = true;
+    }
+
+    if matches.is_present("colored_rims") {
+        ret.colored_rims = true;
     }
 
     if let Some(tty) = matches.value_of("tty").take() {

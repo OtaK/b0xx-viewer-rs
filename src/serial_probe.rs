@@ -101,15 +101,6 @@ pub fn start_serial_probe(
 
     info!("Found B0XX on port {}", b0xx_port.port_name);
 
-    let port_settings = serialport::SerialPortSettings {
-        baud_rate: 115_200,
-        data_bits: serialport::DataBits::Eight,
-        flow_control: serialport::FlowControl::Hardware,
-        parity: serialport::Parity::None,
-        stop_bits: serialport::StopBits::One,
-        timeout: std::time::Duration::from_millis(500),
-    };
-
     let (tx, rx) = crossbeam_channel::bounded(1);
 
     std::thread::Builder::new()
@@ -118,8 +109,15 @@ pub fn start_serial_probe(
             let mut buf = Vec::with_capacity(25);
             let mut state = [B0xxReport::default(); 20];
 
+            let port_builder = serialport::new(&b0xx_port.port_name, 115_200)
+                .data_bits(serialport::DataBits::Eight)
+                .flow_control(serialport::FlowControl::Hardware)
+                .parity(serialport::Parity::None)
+                .stop_bits(serialport::StopBits::One)
+                .timeout(std::time::Duration::from_millis(500));
+
             let mut port =
-                match serialport::open_with_settings(&b0xx_port.port_name, &port_settings) {
+                match port_builder.open() {
                     Ok(port) => port,
                     Err(e) => return tx.send(B0xxMessage::Error(e.into())),
                 };
@@ -195,6 +193,8 @@ pub fn start_serial_probe(
     }
     std::thread::spawn(move || loop {
         let _ = tx.send(B0xxMessage::State(B0xxState::random()));
+        #[cfg(not(feature = "benchmark"))]
+        std::thread::sleep(std::time::Duration::from_millis(170));
     });
 
     Ok(rx)

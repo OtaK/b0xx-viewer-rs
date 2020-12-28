@@ -252,6 +252,8 @@ pub struct ViewerOptions {
     pub button_active_colors: ViewerButtonColors,
     #[serde(default)]
     pub is_r2_b0xx: bool,
+    #[serde(default)]
+    pub colored_rims: bool,
     pub custom_tty: Option<String>,
     #[serde(skip)]
     path: std::path::PathBuf,
@@ -267,6 +269,7 @@ impl Default for ViewerOptions {
             button_active_colors: ViewerButtonColors::new_with_color(*DEFAULT_ACTIVE_COLOR),
             custom_tty: None,
             is_r2_b0xx: false,
+            colored_rims: false,
             path: Default::default(),
         }
     }
