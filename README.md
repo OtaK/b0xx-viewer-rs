@@ -32,15 +32,17 @@ Try launching the executable with `--help` to get all the current options
 Note: This will not work on Windows because of platform restrictions
 
 ```text
-b0xx_viewer 0.4.6
+b0xx_viewer 0.5.0
 Mathieu Amiot <amiot.mathieu@gmail.com>
 GUI Viewer for B0XX controllers; particularly useful for streaming
 
 USAGE:
-    b0xx_viewer.exe [FLAGS] [OPTIONS]
+    b0xx_viewer [FLAGS] [OPTIONS]
 
 FLAGS:
         --chromeless                 Makes the window chromeless
+        --colored_rims               Enables an alternative mode of inactive button coloring; Makes inactive button
+                                     background neutral in favor of button rims instead.
     -h, --help                       Prints help information
         --init_config                Intializes an empty configuration in the executable's folder
     -l, --labels                     Enable button labels
@@ -55,6 +57,7 @@ OPTIONS:
     -c, --config <config>                  Sets the configuration file path
         --tty <tty>                        Provide a custom COM port (Windows-only) or a /dev/ttyXXX path (Unix).
                                            Bypasses auto-detection, so proceed at your own risk!
+
 ```
 
 ### Configuration file
@@ -78,7 +81,13 @@ There's a special feature that you can activate when building/running like so:
 
 `cargo {run|build} --features fake_serial [--release]`
 
-It'll simulate state reports with completely random ones. It looks funky but it allows to test and also assess current GUI performance.
+It'll simulate state reports with completely random ones spaced by 170ms.
+
+### Benchmark mode
+
+`cargo run --features benchmark [--release]`
+
+Starts the project with the `fake_serial` and `fps` features to assess current rendering performance.
 
 ### Enable Windows console for debugging/development
 
