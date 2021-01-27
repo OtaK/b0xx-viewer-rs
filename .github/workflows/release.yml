@@ -16,7 +16,7 @@ jobs:
       - uses: actions/checkout@v1
       - name: Dependencies (Linux)
         if: matrix.os == 'ubuntu-latest'
-        run: sudo apt-get install -y libudev-dev libxcb-shape0-dev libxcb-xfixes0-dev
+        run: sudo apt-get update && sudo apt-get install -y libudev-dev libxcb-shape0-dev libxcb-xfixes0-dev
       - name: Install minimal stable Rust
         uses: actions-rs/toolchain@v1
         with:
