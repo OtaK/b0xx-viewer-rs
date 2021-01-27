@@ -1,6 +1,6 @@
 [package]
 name = "b0xx-viewer-rs"
-version = "0.5.0"
+version = "0.5.1"
 authors = ["Mathieu Amiot <amiot.mathieu@gmail.com>"]
 description = "GUI Viewer for B0XX controllers; particularly useful for streaming"
 edition = "2018"
@@ -22,12 +22,12 @@ rand = { version = "0.8", optional = true }
 conrod_core = "0.71"
 conrod_winit = "0.71"
 conrod_glium = "0.71"
-winit = "0.23"
+winit = "0.24"
 glium = "0.28"
 crossbeam-channel = "0.5"
 clap = "2.33"
 lazy_static = "1.4"
-fps_counter = { version = "1.0", optional = true }
+fps_counter = { version = "2.0", optional = true }
 rusttype = "0.8"
 serde = { version = "1.0", features = ["derive"] }
 toml = "0.5"

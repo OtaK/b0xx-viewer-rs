@@ -76,7 +76,7 @@ pub fn start_gui(mut rx: crossbeam_channel::Receiver<B0xxMessage>, options: View
         .with_decorations(!options.chromeless)
         .with_title(WIN_TITLE)
         .with_resizable(false)
-        .with_inner_size::<glium::glutin::dpi::PhysicalSize<u32>>((WIN_W, WIN_H).into());
+        .with_inner_size::<glium::glutin::dpi::LogicalSize<u32>>((WIN_W, WIN_H).into());
 
     let context = glium::glutin::ContextBuilder::new()
         .with_vsync(true)
