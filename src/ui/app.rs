@@ -27,6 +27,8 @@ impl ViewerAppStatus {
 pub struct ViewerApp {
     pub state: B0xxState,
     pub status: ViewerAppStatus,
+    pub is_draggable: bool,
+    pub is_dragged: bool,
     #[cfg(feature = "fps")]
     pub fps: fps_counter::FPSCounter,
 }

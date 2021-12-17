@@ -7,7 +7,7 @@ use self::{app::*, support::*};
 use crate::{config::ViewerOptions, serial_probe::*};
 
 use conrod_core::widget_ids;
-use glium::{self, Surface};
+use glium::{self, Surface, glutin::event::ModifiersState};
 use conrod_glium::Renderer;
 
 const ALATA_FONT: &[u8] = include_bytes!("../../assets/fonts/Alata-Regular.ttf");
@@ -170,8 +170,42 @@ pub fn start_gui(mut rx: crossbeam_channel::Receiver<B0xxMessage>, options: View
                         ..
                     } => {
                         let _ = glutin_tx.send(());
-                    }
+                    },
+                    // If ALT is held, allow the window to be click-dragged
+                    glium::glutin::event::WindowEvent::ModifiersChanged(modifiers) => {
+                        if modifiers.contains(ModifiersState::ALT) {
+                            app.is_draggable = true;
+                        } else {
+                            app.is_draggable = false;
+                            app.is_dragged = false;
+                        }
+                    },
+                    glium::glutin::event::WindowEvent::MouseInput {
+                        button: glium::glutin::event::MouseButton::Left,
+                        state,
+                        ..
+                    } if app.is_draggable => {
+                        app.is_dragged = state == glium::glutin::event::ElementState::Pressed;
+                    },
                     _ => {}
+                },
+                glium::glutin::event::Event::DeviceEvent {
+                    event: glium::glutin::event::DeviceEvent::MouseMotion { delta: (dx, dy)},
+                    ..
+                } if app.is_dragged => {
+                    let prev_pos = display.0
+                        .gl_window()
+                        .window()
+                        .outer_position()
+                        .unwrap_or_else(|_| glium::glutin::dpi::PhysicalPosition::new(0, 0));
+
+                    display.0
+                        .gl_window()
+                        .window()
+                        .set_outer_position(glium::glutin::dpi::PhysicalPosition::new(
+                            prev_pos.x as f64 + dx,
+                            prev_pos.y as f64 + dy,
+                        ));
                 },
                 _ => {}
             }
