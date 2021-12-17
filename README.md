@@ -32,7 +32,7 @@ Try launching the executable with `--help` to get all the current options
 Note: This will not work on Windows because of platform restrictions
 
 ```text
-b0xx_viewer 0.5.0
+b0xx_viewer 0.6.0
 Mathieu Amiot <amiot.mathieu@gmail.com>
 GUI Viewer for B0XX controllers; particularly useful for streaming
 
@@ -100,6 +100,15 @@ Because Windows is weird, you have a choice between displaying a window without 
 Well, it's a, uh, FPS counter.
 
 `cargo run --features fps`
+
+## License
+
+Licensed under either of these:
+
+- Apache License, Version 2.0, ([LICENSE-APACHE](LICENSE-APACHE) or
+   [https://www.apache.org/licenses/LICENSE-2.0](https://www.apache.org/licenses/LICENSE-2.0)
+- MIT license ([LICENSE-MIT](LICENSE-MIT) or
+   [https://opensource.org/licenses/MIT](https://opensource.org/licenses/MIT))
 
 ## Authors
 

@@ -1,10 +1,11 @@
 [package]
 name = "b0xx-viewer-rs"
-version = "0.5.1"
+version = "0.6.0"
 authors = ["Mathieu Amiot <amiot.mathieu@gmail.com>"]
 description = "GUI Viewer for B0XX controllers; particularly useful for streaming"
-edition = "2018"
+edition = "2021"
 build = "build.rs"
+license = "MIT/Apache-2.0"
 
 [package.metadata.winres]
 OriginalFilename = "b0xx_viewer.exe"
@@ -19,10 +20,10 @@ path = "src/main.rs"
 serialport = "4.0"
 log = "0.4"
 rand = { version = "0.8", optional = true }
-conrod_core = "0.71"
-conrod_winit = "0.71"
-conrod_glium = "0.71"
-winit = "0.24"
+conrod_core = "0.76"
+conrod_winit = "0.76"
+conrod_glium = "0.76"
+winit = "0.26"
 glium = "0.28"
 crossbeam-channel = "0.5"
 clap = "2.33"
@@ -34,7 +35,7 @@ toml = "0.5"
 rgb = { version = "0.8", features = ["serde"] }
 anyhow = "1.0"
 thiserror = "1.0"
-backoff = "0.2"
+backoff = "0.4"
 fern = { version = "0.6", features = ["colored"] }
 chrono = "0.4"
 
