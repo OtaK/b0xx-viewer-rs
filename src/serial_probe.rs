@@ -194,7 +194,7 @@ pub fn start_serial_probe(
     std::thread::spawn(move || loop {
         let _ = tx.send(B0xxMessage::State(B0xxState::random()));
         #[cfg(not(feature = "benchmark"))]
-        std::thread::sleep(std::time::Duration::from_millis(170));
+        std::thread::sleep(std::time::Duration::from_micros(16670));
     });
 
     Ok(rx)
