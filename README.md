@@ -24,7 +24,14 @@ If you wish to setup your input viewer (for example) to use the `--r2` start fla
 
 ### Linux and macOS
 
-Download the executable, and launch it through a terminal.
+Your user needs to be a member of the `dialout` group to access the serial ports exposed over USB.
+
+To do so, run one of the following:
+
+* `` sudo usermod -aG dialout `whoami` ``
+* `` sudo gpasswd -a `whoami` dialout ``
+
+Then download the executable, and launch it through a terminal.
 
 ### Options
 
