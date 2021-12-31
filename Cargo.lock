@@ -128,34 +128,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "cdb031dd78e28731d87d56cc8ffef4a8f36ca26c38fe2de700543e627f8a464a"
 
 [[package]]
-name = "b0xx-viewer-rs"
-version = "0.6.0"
-dependencies = [
- "anyhow",
- "backoff",
- "chrono",
- "clap",
- "conrod_core",
- "conrod_glium",
- "conrod_winit",
- "crossbeam-channel",
- "fern",
- "fps_counter",
- "glium",
- "lazy_static",
- "log",
- "rand",
- "rgb",
- "rusttype 0.8.3",
- "serde",
- "serialport",
- "thiserror",
- "toml",
- "winit 0.26.0",
- "winres",
-]
-
-[[package]]
 name = "backoff"
 version = "0.4.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1573,6 +1545,34 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "9f923fb806c46266c02ab4a5b239735c144bdeda724a50ed058e5226f594cde3"
 dependencies = [
  "ttf-parser",
+]
+
+[[package]]
+name = "parallelograph"
+version = "0.7.0"
+dependencies = [
+ "anyhow",
+ "backoff",
+ "chrono",
+ "clap",
+ "conrod_core",
+ "conrod_glium",
+ "conrod_winit",
+ "crossbeam-channel",
+ "fern",
+ "fps_counter",
+ "glium",
+ "lazy_static",
+ "log",
+ "rand",
+ "rgb",
+ "rusttype 0.8.3",
+ "serde",
+ "serialport",
+ "thiserror",
+ "toml",
+ "winit 0.26.0",
+ "winres",
 ]
 
 [[package]]

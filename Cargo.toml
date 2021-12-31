@@ -1,19 +1,19 @@
 [package]
-name = "b0xx-viewer-rs"
-version = "0.6.0"
+name = "parallelograph"
+version = "0.7.0"
 authors = ["Mathieu Amiot <amiot.mathieu@gmail.com>"]
-description = "GUI Viewer for B0XX controllers; particularly useful for streaming"
+description = "GUI Viewer for B0XX/Frame1 controllers; particularly useful for streaming"
 edition = "2021"
 build = "build.rs"
 license = "MIT/Apache-2.0"
 
 [package.metadata.winres]
-OriginalFilename = "b0xx_viewer.exe"
-LegalCopyright = "Copyright Mathieu \"@OtaK_\" Amiot © 2020"
-ProductName = "B0XX Viewer"
+OriginalFilename = "parallelograph_viewer.exe"
+LegalCopyright = "Copyright Mathieu \"@OtaK_\" Amiot © 2021"
+ProductName = "Parallelograph Controller Viewer"
 
 [[bin]]
-name = "b0xx_viewer"
+name = "parallelograph_viewer"
 path = "src/main.rs"
 
 [dependencies]

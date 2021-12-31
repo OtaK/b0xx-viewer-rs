@@ -3,10 +3,10 @@ pub const WIN_H: u32 = 300;
 pub const BTN_RADIUS: f64 = 40.;
 
 #[cfg(not(feature = "fake_serial"))]
-pub const WIN_TITLE: &str = "B0XX Input Viewer - by @OtaK_";
+pub const WIN_TITLE: &str = "Parallelograph Input Viewer - by @OtaK_";
 
 #[cfg(feature = "fake_serial")]
-pub const WIN_TITLE: &str = "B0XX Input Viewer - by @OtaK_ [FAKE SERIAL MODE]";
+pub const WIN_TITLE: &str = "Parallelograph Input Viewer - by @OtaK_ [FAKE SERIAL MODE]";
 
 pub struct GliumDisplayWinitWrapper(pub glium::Display);
 

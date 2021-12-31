@@ -1,4 +1,4 @@
-use crate::b0xx_state::B0xxState;
+use crate::controllers::ControllerState;
 
 #[derive(Debug, Clone, Copy, Eq, PartialEq)]
 pub enum ViewerAppStatus {
@@ -25,7 +25,7 @@ impl ViewerAppStatus {
 #[derive(Debug, Default)]
 #[cfg_attr(not(feature = "fps"), derive(Clone))]
 pub struct ViewerApp {
-    pub state: B0xxState,
+    pub state: ControllerState,
     pub status: ViewerAppStatus,
     pub is_draggable: bool,
     pub is_dragged: bool,
@@ -34,7 +34,7 @@ pub struct ViewerApp {
 }
 
 impl ViewerApp {
-    pub fn update_state(&mut self, new_state: B0xxState) -> bool {
+    pub fn update_state(&mut self, new_state: ControllerState) -> bool {
         if self.state == new_state {
             return false;
         }

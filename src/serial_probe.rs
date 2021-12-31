@@ -1,4 +1,4 @@
-use crate::b0xx_state::*;
+use crate::controllers::{b0xx::*, ControllerState};
 use crate::error::ViewerError;
 use lazy_static::lazy_static;
 use serde::{Deserialize, Serialize};
@@ -43,15 +43,15 @@ lazy_static! {
 
 #[cfg_attr(feature = "fake_serial", allow(dead_code))]
 #[derive(Debug)]
-pub enum B0xxMessage {
-    State(B0xxState),
+pub enum ControllerMessage {
+    State(ControllerState),
     Error(ViewerError),
     Reconnect,
     Quit,
 }
 
 #[inline]
-pub fn reconnect(custom_tty: &Option<String>) -> crossbeam_channel::Receiver<B0xxMessage> {
+pub fn reconnect(custom_tty: &Option<String>) -> crossbeam_channel::Receiver<ControllerMessage> {
     use backoff::backoff::Backoff as _;
     let mut backoff = backoff::ExponentialBackoff::default();
     loop {
@@ -68,7 +68,7 @@ pub fn reconnect(custom_tty: &Option<String>) -> crossbeam_channel::Receiver<B0x
 #[cfg(not(feature = "fake_serial"))]
 pub fn start_serial_probe(
     custom_tty: &Option<String>,
-) -> Result<crossbeam_channel::Receiver<B0xxMessage>, ViewerError> {
+) -> Result<crossbeam_channel::Receiver<ControllerMessage>, ViewerError> {
     let b0xx_port = serialport::available_ports()?
         .into_iter()
         .find(move |port| {
@@ -97,7 +97,7 @@ pub fn start_serial_probe(
 
             false
         })
-        .ok_or_else(|| ViewerError::B0xxNotFound)?;
+        .ok_or_else(|| ViewerError::ControllerNotFound)?;
 
     info!("Found B0XX on port {}", b0xx_port.port_name);
 
@@ -119,7 +119,7 @@ pub fn start_serial_probe(
             let mut port =
                 match port_builder.open() {
                     Ok(port) => port,
-                    Err(e) => return tx.send(B0xxMessage::Error(e.into())),
+                    Err(e) => return tx.send(ControllerMessage::Error(e.into())),
                 };
 
 
@@ -130,7 +130,7 @@ pub fn start_serial_probe(
             use std::io::BufRead as _;
             loop {
                 if let Err(e) = port.get_mut().write_request_to_send(true) {
-                    return tx.send(B0xxMessage::Error(e.into()));
+                    return tx.send(ControllerMessage::Error(e.into()));
                 }
 
                 let bytes_read: usize = match port.read_until(B0xxReport::End as u8, &mut buf).map_err(Into::into) {
@@ -138,22 +138,22 @@ pub fn start_serial_probe(
                     Err(e) => match &e {
                         ViewerError::IoError(io_error) => match io_error.kind() {
                             std::io::ErrorKind::TimedOut | std::io::ErrorKind::BrokenPipe => {
-                                return tx.send(B0xxMessage::Reconnect);
+                                return tx.send(ControllerMessage::Reconnect);
                             }
                             _ => {
                                 error!("{:?}", e);
-                                return tx.send(B0xxMessage::Quit);
+                                return tx.send(ControllerMessage::Quit);
                             }
                         },
                         _ => {
                             error!("{:?}", e);
-                            return tx.send(B0xxMessage::Quit);
+                            return tx.send(ControllerMessage::Quit);
                         }
                     }
                 };
 
                 if let Err(e) = port.get_mut().write_request_to_send(false) {
-                    return tx.send(B0xxMessage::Error(e.into()));
+                    return tx.send(ControllerMessage::Error(e.into()));
                 }
 
                 trace!("Bytes read: {}", bytes_read);
@@ -173,7 +173,7 @@ pub fn start_serial_probe(
 
                 buf.clear();
 
-                if tx.send(B0xxMessage::State(state.into())).is_err() {
+                if tx.send(ControllerMessage::State(state.into())).is_err() {
                     info!("Reconnection detected, exiting runloop");
                     return Ok(());
                 }
@@ -186,13 +186,13 @@ pub fn start_serial_probe(
 #[cfg(feature = "fake_serial")]
 pub fn start_serial_probe(
     _: &Option<String>,
-) -> Result<crossbeam_channel::Receiver<B0xxMessage>, ViewerError> {
+) -> Result<crossbeam_channel::Receiver<ControllerMessage>, ViewerError> {
     let (tx, rx) = crossbeam_channel::bounded(1);
     if std::env::var("RELAX_ARDUINO_DETECT").is_ok() {
         info!("{:#?}", *ARDUINO_WHITELIST)
     }
     std::thread::spawn(move || loop {
-        let _ = tx.send(B0xxMessage::State(B0xxState::random()));
+        let _ = tx.send(ControllerMessage::State(ControllerState::random()));
         #[cfg(not(feature = "benchmark"))]
         std::thread::sleep(std::time::Duration::from_micros(16670));
     });
@@ -202,7 +202,7 @@ pub fn start_serial_probe(
 
 #[allow(dead_code)]
 #[inline(always)]
-fn exhaust_buffer(port: &mut Box<dyn serialport::SerialPort>, tx: &crossbeam_channel::Sender<B0xxMessage>) {
+fn exhaust_buffer(port: &mut Box<dyn serialport::SerialPort>, tx: &crossbeam_channel::Sender<ControllerMessage>) {
     // Exhaust the initial buffer till we find the end of a report and consume it.
     // This is caused by a UB in Windows' COM port handling causing partial reports
     // sometimes
@@ -215,7 +215,7 @@ fn exhaust_buffer(port: &mut Box<dyn serialport::SerialPort>, tx: &crossbeam_cha
             .map_err(ViewerError::from)
         {
             error!("{:?}", e);
-            let _ = tx.send(B0xxMessage::Quit);
+            let _ = tx.send(ControllerMessage::Quit);
             break;
         }
 
@@ -226,6 +226,6 @@ fn exhaust_buffer(port: &mut Box<dyn serialport::SerialPort>, tx: &crossbeam_cha
     }
 
     if let Err(e) = port.clear(serialport::ClearBuffer::All) {
-        let _ = tx.send(B0xxMessage::Error(e.into()));
+        let _ = tx.send(ControllerMessage::Error(e.into()));
     }
 }

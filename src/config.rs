@@ -26,7 +26,7 @@ macro_rules! hex_to_color {
     }};
 }
 
-pub const DEFAULT_FILENAME: &str = "b0xx_viewer_config.toml";
+pub const DEFAULT_FILENAME: &str = "parallelograph_viewer_config.toml";
 
 lazy_static! {
     pub static ref DEFAULT_ACTIVE_COLOR: ViewerColor = ViewerColor(rgb::RGB8::new(0, 235, 255));
@@ -268,7 +268,7 @@ impl Default for ViewerOptions {
             button_inactive_colors: ViewerButtonColors::new_with_color(*DEFAULT_INACTIVE_COLOR),
             button_active_colors: ViewerButtonColors::new_with_color(*DEFAULT_ACTIVE_COLOR),
             custom_tty: None,
-            is_r2_b0xx: false,
+            is_r2_b0xx: true,
             colored_rims: false,
             path: Default::default(),
         }

@@ -3,7 +3,7 @@ use crate::hex_to_color;
 use clap::{clap_app, crate_authors, crate_description, crate_version};
 
 pub fn cli_options() -> ViewerOptions {
-    let matches = clap_app!(b0xx_viewer =>
+    let matches = clap_app!(parallelograph =>
         (version: crate_version!())
         (author: crate_authors!())
         (about: crate_description!())
@@ -16,7 +16,7 @@ pub fn cli_options() -> ViewerOptions {
         (@arg chromeless: --chromeless "Makes the window chromeless")
         (@arg tty: --tty +takes_value "Provide a custom COM port (Windows-only) or a /dev/ttyXXX path (Unix). Bypasses auto-detection, so proceed at your own risk!")
         (@arg relax_arduino: --relax_arduino_detection "Relaxes B0XX detection to allow any 16MHz Arduino-compatible device to connect")
-        (@arg r2: --r2 "Enables B0XX r2 mode to account for the 2 extra buttons")
+        (@arg r1: --r1 "Disables B0XX r2 mode buttons for when you have a r1 B0XX")
         (@arg colored_rims: --colored_rims "Enables an alternative mode of inactive button coloring; Makes inactive button background neutral in favor of button rims instead.")
     )
     .get_matches();
@@ -24,7 +24,7 @@ pub fn cli_options() -> ViewerOptions {
     if matches.is_present("init_config") {
         let mut ret = ViewerOptions::default();
         let _ = ret.save_cwd().unwrap();
-        info!("configuration saved in ./b0xx_viewer_config.toml");
+        info!("configuration saved in ./parallelograph_config.toml");
         std::process::exit(0);
     }
 
@@ -54,8 +54,8 @@ pub fn cli_options() -> ViewerOptions {
         ret.chromeless = true;
     }
 
-    if matches.is_present("r2") {
-        ret.is_r2_b0xx = true;
+    if matches.is_present("r1") {
+        ret.is_r2_b0xx = false;
     }
 
     if matches.is_present("colored_rims") {

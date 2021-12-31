@@ -2,7 +2,7 @@ use super::{app::*, Ids};
 use crate::config::ViewerOptions;
 use crate::ui::support::{BTN_RADIUS, WIN_H, WIN_W};
 
-pub fn theme() -> conrod_core::Theme {
+pub fn b0xx_theme() -> conrod_core::Theme {
     use conrod_core::position::{Align, Direction, Padding, Position, Relative};
     conrod_core::Theme {
         name: "B0XX theme".to_string(),

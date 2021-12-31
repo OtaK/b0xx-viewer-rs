@@ -3,7 +3,7 @@
 #[macro_use]
 extern crate log;
 
-mod b0xx_state;
+mod controllers;
 mod cli;
 #[macro_use]
 mod config;
@@ -16,9 +16,9 @@ pub use self::error::*;
 
 pub fn main() {
     if let Ok(env) = std::env::var("RUST_LOG") {
-        std::env::set_var("RUST_LOG", format!("b0xx_viewer=info,{}", env));
+        std::env::set_var("RUST_LOG", format!("parallelograph_viewer=info,{}", env));
     } else {
-        std::env::set_var("RUST_LOG", "b0xx_viewer=info");
+        std::env::set_var("RUST_LOG", "parallelograph_viewer=info");
     }
 
     let mut logger = logger::Logger::new();

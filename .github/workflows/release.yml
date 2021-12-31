@@ -35,16 +35,16 @@ jobs:
       - name: Move/rename executable (Linux)
         if: matrix.os == 'ubuntu-latest'
         run: |
-          mv target/release/b0xx_viewer b0xx_viewer_linux_${{ github.event.release.tag_name }}
+          mv target/release/parallelograph_viewer parallelograph_viewer_linux_${{ github.event.release.tag_name }}
       - name: Move/rename executable (macOS)
         if: matrix.os == 'macos-latest'
         run: |
-          mv target/release/b0xx_viewer b0xx_viewer_macos_${{ github.event.release.tag_name }}
+          mv target/release/parallelograph_viewer parallelograph_viewer_macos_${{ github.event.release.tag_name }}
       - name: Move/rename executable (Windows)
         if: matrix.os == 'windows-latest'
         shell: bash
         run: |
-          mv target/release/b0xx_viewer.exe b0xx_viewer_windows_${{ github.event.release.tag_name }}.exe
+          mv target/release/parallelograph_viewer.exe parallelograph_viewer_windows_${{ github.event.release.tag_name }}.exe
       - name: Upload Release Asset (Linux)
         if: matrix.os == 'ubuntu-latest'
         uses: actions/upload-release-asset@v1.0.1
@@ -52,8 +52,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ github.event.release.upload_url }}
-          asset_path: ./b0xx_viewer_linux_${{ github.event.release.tag_name }}
-          asset_name: b0xx_viewer_linux_${{ github.event.release.tag_name }}
+          asset_path: ./parallelograph_viewer_linux_${{ github.event.release.tag_name }}
+          asset_name: parallelograph_viewer_linux_${{ github.event.release.tag_name }}
           asset_content_type: application/zip
       - name: Upload Release Asset (Windows)
         if: matrix.os == 'windows-latest'
@@ -62,8 +62,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ github.event.release.upload_url }}
-          asset_path: ./b0xx_viewer_windows_${{ github.event.release.tag_name }}.exe
-          asset_name: b0xx_viewer_windows_${{ github.event.release.tag_name }}.exe
+          asset_path: ./parallelograph_viewer_windows_${{ github.event.release.tag_name }}.exe
+          asset_name: parallelograph_viewer_windows_${{ github.event.release.tag_name }}.exe
           asset_content_type: application/zip
       - name: Upload Release Asset (macOS)
         if: matrix.os == 'macos-latest'
@@ -72,6 +72,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ github.event.release.upload_url }}
-          asset_path: ./b0xx_viewer_macos_${{ github.event.release.tag_name }}
-          asset_name: b0xx_viewer_macos_${{ github.event.release.tag_name }}
+          asset_path: ./parallelograph_viewer_macos_${{ github.event.release.tag_name }}
+          asset_name: parallelograph_viewer_macos_${{ github.event.release.tag_name }}
           asset_content_type: application/zip

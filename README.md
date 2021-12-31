@@ -1,6 +1,6 @@
-# b0xx-viewer
+# parallelograph
 
-A multi-platform B0XX input viewer for your streaming needs
+A multi-platform B0XX / Frame1 input viewer for your streaming needs
 
 ## Installation
 
@@ -14,7 +14,7 @@ Double click on the .exe file.
 
 #### Passing arguments to a .exe file
 
-If you wish to setup your input viewer (for example) to use the `--r2` start flag, enabling B0XX r2 buttons:
+If you wish to setup your input viewer (for example) to use the `--r1` start flag, removing B0XX r2 buttons:
 
 * Right click on the .exe file, click on "Create shortcut"
 * On the newly created shortcut, right click, go to "Properties"
@@ -39,12 +39,12 @@ Try launching the executable with `--help` to get all the current options
 Note: This will not work on Windows because of platform restrictions
 
 ```text
-b0xx_viewer 0.6.0
+parallelograph 0.7.0
 Mathieu Amiot <amiot.mathieu@gmail.com>
-GUI Viewer for B0XX controllers; particularly useful for streaming
+GUI Viewer for B0XX / Frame1 controllers; particularly useful for streaming
 
 USAGE:
-    b0xx_viewer [FLAGS] [OPTIONS]
+    parallelograph [FLAGS] [OPTIONS]
 
 FLAGS:
         --chromeless                 Makes the window chromeless
@@ -53,8 +53,8 @@ FLAGS:
     -h, --help                       Prints help information
         --init_config                Intializes an empty configuration in the executable's folder
     -l, --labels                     Enable button labels
-        --r2                         Enables B0XX r2 mode to account for the 2 extra buttons
-        --relax_arduino_detection    Relaxes B0XX detection to allow any 16MHz Arduino-compatible device to connect
+        --r1                         Disables B0XX r2 mode buttons for when you have a r1 B0XX
+        --relax_arduino_detection    Relaxes Controller detection to allow any 16MHz Arduino-compatible B0XX-like device to connect
     -V, --version                    Prints version information
 
 OPTIONS:
@@ -121,3 +121,4 @@ Licensed under either of these:
 
 * Mathieu "OtaK_" Amiot
 * 20XX Inc. - Makers of the B0XX
+* Frame1 - Makers of the Frame1

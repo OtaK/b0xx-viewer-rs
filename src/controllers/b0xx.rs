@@ -1,5 +1,7 @@
 use std::convert::TryFrom;
 
+use super::ControllerState;
+
 #[derive(Debug, Clone, Copy, Eq, PartialEq)]
 #[repr(u8)]
 pub enum B0xxReport {
@@ -35,59 +37,7 @@ impl From<u8> for B0xxReport {
     }
 }
 
-#[derive(Debug, Default, Clone, Copy, Eq, PartialEq)]
-pub struct B0xxState {
-    pub start: bool,
-    pub y: bool,
-    pub x: bool,
-    pub b: bool,
-    pub a: bool,
-    pub l: bool,
-    pub r: bool,
-    pub z: bool,
-    pub up: bool,
-    pub down: bool,
-    pub right: bool,
-    pub left: bool,
-    pub mod_x: bool,
-    pub mod_y: bool,
-    pub c_left: bool,
-    pub c_right: bool,
-    pub c_up: bool,
-    pub c_down: bool,
-    pub mod_ls: bool,
-    pub mod_ms: bool,
-}
-
-#[cfg(feature = "fake_serial")]
-impl B0xxState {
-    pub fn random() -> Self {
-        B0xxState {
-            start: rand::random::<bool>(),
-            y: rand::random::<bool>(),
-            x: rand::random::<bool>(),
-            b: rand::random::<bool>(),
-            a: rand::random::<bool>(),
-            l: rand::random::<bool>(),
-            r: rand::random::<bool>(),
-            z: rand::random::<bool>(),
-            up: rand::random::<bool>(),
-            down: rand::random::<bool>(),
-            right: rand::random::<bool>(),
-            left: rand::random::<bool>(),
-            mod_x: rand::random::<bool>(),
-            mod_y: rand::random::<bool>(),
-            c_left: rand::random::<bool>(),
-            c_right: rand::random::<bool>(),
-            c_up: rand::random::<bool>(),
-            c_down: rand::random::<bool>(),
-            mod_ls: rand::random::<bool>(),
-            mod_ms: rand::random::<bool>(),
-        }
-    }
-}
-
-impl TryFrom<&[B0xxReport]> for B0xxState {
+impl TryFrom<&[B0xxReport]> for ControllerState {
     type Error = crate::error::ViewerError;
 
     fn try_from(value: &[B0xxReport]) -> Result<Self, Self::Error> {
@@ -95,7 +45,7 @@ impl TryFrom<&[B0xxReport]> for B0xxState {
             return Err(crate::error::ViewerError::MalformedSerialReport);
         }
 
-        Ok(B0xxState {
+        Ok(ControllerState {
             start: value[0].into(),
             y: value[1].into(),
             x: value[2].into(),
@@ -120,9 +70,9 @@ impl TryFrom<&[B0xxReport]> for B0xxState {
     }
 }
 
-impl From<[B0xxReport; 20]> for B0xxState {
+impl From<[B0xxReport; 20]> for ControllerState {
     fn from(value: [B0xxReport; 20]) -> Self {
-        B0xxState {
+        ControllerState {
             start: value[0].into(),
             y: value[1].into(),
             x: value[2].into(),
@@ -147,9 +97,9 @@ impl From<[B0xxReport; 20]> for B0xxState {
     }
 }
 
-impl From<[B0xxReport; 25]> for B0xxState {
+impl From<[B0xxReport; 25]> for ControllerState {
     fn from(value: [B0xxReport; 25]) -> Self {
-        B0xxState {
+        ControllerState {
             start: value[0].into(),
             y: value[1].into(),
             x: value[2].into(),

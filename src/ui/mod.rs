@@ -68,7 +68,7 @@ widget_ids! {
     }
 }
 
-pub fn start_gui(mut rx: crossbeam_channel::Receiver<B0xxMessage>, options: ViewerOptions) {
+pub fn start_gui(mut rx: crossbeam_channel::Receiver<ControllerMessage>, options: ViewerOptions) {
     // Build the window.
     let mut events_loop = glium::glutin::event_loop::EventLoop::new();
 
@@ -92,7 +92,8 @@ pub fn start_gui(mut rx: crossbeam_channel::Receiver<B0xxMessage>, options: View
 
     // Construct our `Ui`.
     let mut ui = conrod_core::UiBuilder::new([WIN_W as f64, WIN_H as f64])
-        .theme(gui::theme())
+        // TODO: Change theme depending if the controller is a b0xx or a f1 controller
+        .theme(gui::b0xx_theme())
         .build();
 
     ui.set_num_redraw_frames(1);
@@ -126,19 +127,19 @@ pub fn start_gui(mut rx: crossbeam_channel::Receiver<B0xxMessage>, options: View
 
         let mut maybe_state = match rx.iter().next() {
             Some(message) => match message {
-                B0xxMessage::State(state) => {
+                ControllerMessage::State(state) => {
                     app.status.set_running();
                     Some(state)
                 }
-                B0xxMessage::Error(e) => {
+                ControllerMessage::Error(e) => {
                     error!("{}", e);
                     app.status = ViewerAppStatus::NeedsReconnection;
                     None
                 }
-                B0xxMessage::Quit => {
+                ControllerMessage::Quit => {
                     break 'main;
                 }
-                B0xxMessage::Reconnect => {
+                ControllerMessage::Reconnect => {
                     app.status = ViewerAppStatus::NeedsReconnection;
                     None
                 }
@@ -216,7 +217,7 @@ pub fn start_gui(mut rx: crossbeam_channel::Receiver<B0xxMessage>, options: View
             break 'main;
         }
 
-        // Instantiate the b0xx viewer GUI
+        // Instantiate the parallelograph viewer GUI
         gui::render_gui(&mut ui.set_widgets(), &ids, &mut app, &options);
 
         // Draw the `Ui`.
