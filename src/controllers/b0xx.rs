@@ -126,6 +126,9 @@ impl From<[B0xxReport; 25]> for ControllerState {
 
 #[cfg(feature = "gilrs_backend")]
 impl ControllerState {
+    // Ref: https://github.com/project-slippi/Ishiiruka/blob/slippi/Data/Sys/Config/Profiles/GCPad/B0XX.ini
+    // Ref: https://github.com/project-slippi/Ishiiruka/blob/slippi/Data/Sys/Config/Profiles/GCPad/B0XX_Linux.ini
+    // Ref: https://github.com/project-slippi/Ishiiruka/blob/slippi/Data/Sys/Config/Profiles/GCPad/B0XX_macOS.ini
     pub(crate) fn from_b0xx_gilrs(state: &gilrs::ev::state::GamepadState) -> Self {
         let mut c_state = Self::default();
 
