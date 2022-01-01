@@ -170,8 +170,8 @@ impl ControllerState {
                 2 if value < 0. => c_state.c_left = true,
                 3 if value > 0. => c_state.c_up = true,
                 3 if value < 0. => c_state.c_down = true,
-                4 if value > 45. => c_state.mod_ms = true,
-                4 if value > 10. => c_state.mod_ls = true,
+                4 if value > 24000. => c_state.mod_ms = true,
+                4 if value > 12000. => c_state.mod_ls = true,
                 _ => continue,
             }
         }
