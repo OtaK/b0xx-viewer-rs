@@ -41,29 +41,58 @@ Note: This will not work on Windows because of platform restrictions
 ```text
 parallelograph 0.7.0
 Mathieu Amiot <amiot.mathieu@gmail.com>
-GUI Viewer for B0XX / Frame1 controllers; particularly useful for streaming
+GUI Viewer for B0XX/Frame1 controllers; particularly useful for streaming
 
 USAGE:
-    parallelograph [FLAGS] [OPTIONS]
-
-FLAGS:
-        --chromeless                 Makes the window chromeless
-        --colored_rims               Enables an alternative mode of inactive button coloring; Makes inactive button
-                                     background neutral in favor of button rims instead.
-    -h, --help                       Prints help information
-        --init_config                Intializes an empty configuration in the executable's folder
-    -l, --labels                     Enable button labels
-        --r1                         Disables B0XX r2 mode buttons for when you have a r1 B0XX
-        --relax_arduino_detection    Relaxes Controller detection to allow any 16MHz Arduino-compatible B0XX-like device to connect
-    -V, --version                    Prints version information
+    parallelograph_viewer.exe [OPTIONS]
 
 OPTIONS:
-    -b, --background <bg_color>            Sets a custom background color in hex format, eg. "#00FF00"
-    -a, --active <btn_active_color>        Sets a custom color for pressed/active buttons in hex format, eg. "#00FF00"
-    -i, --inactive <btn_inactive_color>    Sets a custom color for inactive buttons in hex format, eg. "#00FF00"
-    -c, --config <config>                  Sets the configuration file path
-        --tty <tty>                        Provide a custom COM port (Windows-only) or a /dev/ttyXXX path (Unix).
-                                           Bypasses auto-detection, so proceed at your own risk!
+    -a, --active <BTN_ACTIVE_COLOR>
+            Sets a custom color for pressed/active buttons in hex format, eg. "#00FF00"
+
+    -b, --background <BG_COLOR>
+            Sets a custom background color in hex format, eg. "#00FF00"
+
+    -c, --config <CONFIG>
+            Sets the configuration file path
+
+        --chromeless
+            Makes the window chromeless - which means no borders, no titlebar, no close/minimize
+            buttons etc
+
+        --colored-rims
+            Enables an alternative mode of inactive button coloring; Makes inactive button
+            background neutral in favor of button rims instead
+
+    -h, --help
+            Print help information
+
+    -i, --inactive <BTN_INACTIVE_COLOR>
+            Sets a custom color for inactive buttons in hex format, eg. "#00FF00"
+
+        --init-config
+            Intializes an empty configuration in the executable's folder
+
+    -j, --joystick-backend
+            Uses system controller/joystick APIs to poll the controller state. Warning: You WILL
+            lose input reporting accuracy because of it; for instance, this mode has no way of
+            telling if a ModX/Y button is pressed if no accompanying direction isn't pressed
+
+    -l, --labels
+            Enable button labels
+
+        --r1
+            Disables B0XX r2 mode buttons for when you have a r1 B0XX
+
+        --relax-arduino-detection
+            Relaxes B0XX detection to allow any 16MHz Arduino-compatible device to connect
+
+        --tty <TTY>
+            Provide a custom COM port (Windows-only) or a /dev/ttyXXX path (Unix). Bypasses auto-
+            detection, so proceed at your own risk!
+
+    -V, --version
+            Print version information
 
 ```
 
@@ -71,7 +100,7 @@ OPTIONS:
 
 A good example is in `cfg/gcc.toml`
 
-You can create your own configuration file by launching the program with the `--init_config` option, then modify it with your favorite text editor!
+You can create your own configuration file by launching the program with the `--init-config` option, then modify it with your favorite text editor!
 
 ## Building
 
@@ -82,11 +111,11 @@ Prequisites:
 
 Just `cargo build --release` and you should be good to go
 
-### Fake Serial Mode / Dev mode
+### Fake Inputs Mode / Dev mode
 
 There's a special feature that you can activate when building/running like so:
 
-`cargo {run|build} --features fake_serial [--release]`
+`cargo {run|build} --features fake_inputs [--release]`
 
 It'll simulate state reports with completely random ones spaced by 170ms.
 
@@ -94,7 +123,9 @@ It'll simulate state reports with completely random ones spaced by 170ms.
 
 `cargo run --features benchmark [--release]`
 
-Starts the project with the `fake_serial` and `fps` features to assess current rendering performance.
+Starts the project with the `fake_inputs` and `fps` features to assess current rendering performance.
+
+It currently stands at ~6500 fps (on a Ryzen 9 5950X / RTX3080 system running Windows 10).
 
 ### Enable Windows console for debugging/development
 
@@ -120,5 +151,8 @@ Licensed under either of these:
 ## Authors
 
 * Mathieu "OtaK_" Amiot
+
+I am not affiliated in any way with the following companies, and their IP remains their own:
+
 * 20XX Inc. - Makers of the B0XX
-* Frame1 - Makers of the Frame1
+* Frame1 LLC - Makers of the Frame1

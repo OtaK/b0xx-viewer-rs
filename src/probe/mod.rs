@@ -1,12 +1,16 @@
-use crate::{ViewerResult, controllers::{ControllerState, ControllerType}, ViewerError, config::ViewerOptions};
+use crate::{
+    config::ViewerOptions,
+    controllers::{ControllerState, ControllerType},
+    ViewerError, ViewerResult,
+};
 
-#[cfg(feature = "serial_backend")]
+pub mod gilrs;
 pub mod serial;
 
-#[cfg(feature = "gilrs_backend")]
-pub mod gilrs;
+#[cfg(feature = "fake_inputs")]
+pub mod dummy;
 
-#[cfg_attr(feature = "fake_serial", allow(dead_code))]
+#[allow(dead_code)]
 #[derive(Debug)]
 pub enum ControllerMessage {
     State(ControllerState),
@@ -16,9 +20,11 @@ pub enum ControllerMessage {
 }
 
 pub trait ControllerProbe {
-    fn new(config: ViewerOptions) -> ViewerResult<Self> where Self: Sized;
-    fn controller_type(&self) -> ControllerType;
+    fn new(config: &ViewerOptions) -> ViewerResult<Self>
+    where
+        Self: Sized;
 
+    fn controller_type(&self) -> ControllerType;
     fn is_connected(&self) -> bool;
     fn connect(&mut self) -> ViewerResult<crossbeam_channel::Receiver<ControllerMessage>>;
     fn disconnect(&mut self);

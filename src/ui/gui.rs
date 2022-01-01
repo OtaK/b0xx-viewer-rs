@@ -502,7 +502,7 @@ fn make_button(
         inactive_color
     };
     let text_color = if display_labels {
-        let tmp: conrod_core::Color = color.clone().into();
+        let tmp: conrod_core::Color = color.into();
         Some(tmp.plain_contrast())
     } else {
         None
@@ -513,16 +513,16 @@ fn make_button(
             BTN_RADIUS,
             widget::primitive::line::Style::solid()
                 .color(inactive_color.into())
-                .thickness(2.)
+                .thickness(2.),
         )
     } else {
         widget::Circle::fill_with(BTN_RADIUS, color.into())
     };
 
     widget = widget
-            .parent(parent)
-            .graphics_for(parent)
-            .w_h(BTN_RADIUS, BTN_RADIUS);
+        .parent(parent)
+        .graphics_for(parent)
+        .w_h(BTN_RADIUS, BTN_RADIUS);
 
     (widget, text_color)
 }

@@ -1,8 +1,14 @@
-use crate::controllers::{b0xx::*, ControllerState};
-use super::ControllerMessage;
+use std::sync::{
+    atomic::{AtomicBool, Ordering},
+    Arc,
+};
+
+use super::{ControllerMessage, ControllerProbe};
+use crate::controllers::{b0xx::*, ControllerType};
 use crate::error::ViewerError;
 use lazy_static::lazy_static;
 use serde::{Deserialize, Serialize};
+use serialport::SerialPortInfo;
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 struct WhitelistFile {
@@ -30,7 +36,7 @@ impl std::convert::TryFrom<UsbStringDef> for UsbDefinition {
     }
 }
 
-const ARDUINO_WHITELIST_BYTES: &[u8] = include_bytes!("../assets/arduino_whitelist.toml");
+const ARDUINO_WHITELIST_BYTES: &[u8] = include_bytes!("../../assets/arduino_whitelist.toml");
 lazy_static! {
     static ref ARDUINO_WHITELIST: Vec<UsbDefinition> = {
         let res: WhitelistFile = toml::from_slice(ARDUINO_WHITELIST_BYTES).unwrap();
@@ -41,79 +47,89 @@ lazy_static! {
             .collect()
     };
 }
-
-#[inline]
-pub fn reconnect(custom_tty: &Option<String>) -> crossbeam_channel::Receiver<ControllerMessage> {
-    use backoff::backoff::Backoff as _;
-    let mut backoff = backoff::ExponentialBackoff::default();
-    loop {
-        if let Ok(new_rx) = start_serial_probe(custom_tty) {
-            return new_rx;
-        }
-
-        if let Some(backoff_duration) = backoff.next_backoff() {
-            std::thread::sleep(backoff_duration);
-        }
-    }
+#[derive(Debug)]
+pub struct SerialControllerProbe {
+    serial_port_info: SerialPortInfo,
+    controller_type: ControllerType,
+    thread_handle: Option<std::thread::JoinHandle<()>>,
+    is_connected: Arc<AtomicBool>,
 }
 
-#[cfg(not(feature = "fake_serial"))]
-pub fn start_serial_probe(
-    custom_tty: &Option<String>,
-) -> Result<crossbeam_channel::Receiver<ControllerMessage>, ViewerError> {
-    let b0xx_port = serialport::available_ports()?
-        .into_iter()
-        .find(move |port| {
-            if let Some(custom_tty) = custom_tty {
-                if port.port_name == *custom_tty {
-                    return true;
-                }
-            } else if let serialport::SerialPortType::UsbPort(portinfo) = &port.port_type {
-                if std::env::var("RELAX_ARDUINO_DETECT").is_ok() {
-                    if ARDUINO_WHITELIST
-                        .iter()
-                        .any(|def| def.vid == portinfo.vid && def.pid == portinfo.pid)
-                    {
-                        return true;
+impl ControllerProbe for SerialControllerProbe {
+    fn new(config: &crate::config::ViewerOptions) -> crate::ViewerResult<Self>
+    where
+        Self: Sized,
+    {
+        let (serial_port_info, controller_type) = serialport::available_ports()?
+            .into_iter()
+            .find_map(move |port| {
+                if let Some(custom_tty) = config.custom_tty.as_ref() {
+                    if port.port_name == *custom_tty {
+                        return Some((port, ControllerType::DIYB0XX));
                     }
-                } else if portinfo.vid == 9025 && portinfo.pid == 32822 {
-                    return true;
+                } else if let serialport::SerialPortType::UsbPort(portinfo) = &port.port_type {
+                    if std::env::var("RELAX_ARDUINO_DETECT").is_ok() {
+                        if ARDUINO_WHITELIST
+                            .iter()
+                            .any(|def| def.vid == portinfo.vid && def.pid == portinfo.pid)
+                        {
+                            return Some((port, ControllerType::DIYB0XX));
+                        }
+                    } else if portinfo.vid == 9025 && portinfo.pid == 32822 {
+                        return Some((port, ControllerType::B0XX));
+                    }
+
+                    if let Some(product) = &portinfo.product {
+                        if product == "Arduino_Leonardo" {
+                            return Some((port, ControllerType::B0XX));
+                        } else if product == "Frame1" {
+                            return Some((port, ControllerType::Frame1));
+                        }
+                    }
                 }
 
-                if let Some(product) = &portinfo.product {
-                    if product == "Arduino_Leonardo" {
-                        return true;
-                    }
-                }
-            }
+                None
+            })
+            .ok_or(ViewerError::ControllerNotFound)?;
 
-            false
+        Ok(Self {
+            serial_port_info,
+            controller_type,
+            thread_handle: None,
+            is_connected: Arc::new(true.into()),
         })
-        .ok_or_else(|| ViewerError::ControllerNotFound)?;
+    }
 
-    info!("Found B0XX on port {}", b0xx_port.port_name);
+    fn controller_type(&self) -> crate::controllers::ControllerType {
+        self.controller_type
+    }
 
-    let (tx, rx) = crossbeam_channel::bounded(1);
+    fn is_connected(&self) -> bool {
+        self.thread_handle.is_some() && self.is_connected.load(Ordering::SeqCst)
+    }
 
-    std::thread::Builder::new()
-        .name("b0xx_viewer_serial".into())
-        .spawn(move || {
+    fn connect(&mut self) -> crate::ViewerResult<crossbeam_channel::Receiver<ControllerMessage>> {
+        let controller_port = self.serial_port_info.clone();
+
+        let (tx, rx) = crossbeam_channel::bounded(1);
+        let thread_hwnd = std::thread::spawn(move || {
             let mut buf = Vec::with_capacity(25);
             let mut state = [B0xxReport::default(); 20];
 
-            let port_builder = serialport::new(&b0xx_port.port_name, 115_200)
+            let port_builder = serialport::new(&controller_port.port_name, 115_200)
                 .data_bits(serialport::DataBits::Eight)
                 .flow_control(serialport::FlowControl::Hardware)
                 .parity(serialport::Parity::None)
                 .stop_bits(serialport::StopBits::One)
                 .timeout(std::time::Duration::from_millis(500));
 
-            let mut port =
-                match port_builder.open() {
-                    Ok(port) => port,
-                    Err(e) => return tx.send(ControllerMessage::Error(e.into())),
-                };
-
+            let mut port = match port_builder.open() {
+                Ok(port) => port,
+                Err(e) => {
+                    let _ = tx.send(ControllerMessage::Error(e.into()));
+                    return;
+                }
+            };
 
             exhaust_buffer(&mut port, &tx);
 
@@ -122,37 +138,49 @@ pub fn start_serial_probe(
             use std::io::BufRead as _;
             loop {
                 if let Err(e) = port.get_mut().write_request_to_send(true) {
-                    return tx.send(ControllerMessage::Error(e.into()));
+                    let _ = tx.send(ControllerMessage::Error(e.into()));
+                    return;
                 }
 
-                let bytes_read: usize = match port.read_until(B0xxReport::End as u8, &mut buf).map_err(Into::into) {
+                let bytes_read: usize = match port
+                    .read_until(B0xxReport::End as u8, &mut buf)
+                    .map_err(Into::into)
+                {
                     Ok(bytes) => bytes,
                     Err(e) => match &e {
                         ViewerError::IoError(io_error) => match io_error.kind() {
                             std::io::ErrorKind::TimedOut | std::io::ErrorKind::BrokenPipe => {
-                                return tx.send(ControllerMessage::Reconnect);
+                                let _ = tx.send(ControllerMessage::Reconnect);
+                                return;
                             }
                             _ => {
                                 error!("{:?}", e);
-                                return tx.send(ControllerMessage::Quit);
+                                let _ = tx.send(ControllerMessage::Quit);
+                                return;
                             }
                         },
                         _ => {
                             error!("{:?}", e);
-                            return tx.send(ControllerMessage::Quit);
+                            let _ = tx.send(ControllerMessage::Quit);
+                            return;
                         }
-                    }
+                    },
                 };
 
                 if let Err(e) = port.get_mut().write_request_to_send(false) {
-                    return tx.send(ControllerMessage::Error(e.into()));
+                    let _ = tx.send(ControllerMessage::Error(e.into()));
+                    return;
                 }
 
                 trace!("Bytes read: {}", bytes_read);
 
                 port.consume(bytes_read);
                 if bytes_read == 25 {
-                    let end_index = buf.iter().position(|item| *item == B0xxReport::End as u8).unwrap() - 4;
+                    let end_index = buf
+                        .iter()
+                        .position(|item| *item == B0xxReport::End as u8)
+                        .unwrap()
+                        - 4;
                     let start_index = end_index - 20;
                     trace!("Selected range: {}..{}", start_index, end_index);
 
@@ -167,34 +195,30 @@ pub fn start_serial_probe(
 
                 if tx.send(ControllerMessage::State(state.into())).is_err() {
                     info!("Reconnection detected, exiting runloop");
-                    return Ok(());
+                    return;
                 }
             }
-        })?;
-
-    Ok(rx)
-}
-
-#[cfg(feature = "fake_serial")]
-pub fn start_serial_probe(
-    _: &Option<String>,
-) -> Result<crossbeam_channel::Receiver<ControllerMessage>, ViewerError> {
-    let (tx, rx) = crossbeam_channel::bounded(1);
-    if std::env::var("RELAX_ARDUINO_DETECT").is_ok() {
-        info!("{:#?}", *ARDUINO_WHITELIST)
+        });
+        self.thread_handle = Some(thread_hwnd);
+        Ok(rx)
     }
-    std::thread::spawn(move || loop {
-        let _ = tx.send(ControllerMessage::State(ControllerState::random()));
-        #[cfg(not(feature = "benchmark"))]
-        std::thread::sleep(std::time::Duration::from_micros(16670));
-    });
 
-    Ok(rx)
+    fn disconnect(&mut self) {
+        if !self.is_connected() {
+            return;
+        }
+
+        if let Some(thread_hwnd) = self.thread_handle.take() {
+            let _ = thread_hwnd.join();
+        }
+    }
 }
 
-#[allow(dead_code)]
 #[inline(always)]
-fn exhaust_buffer(port: &mut Box<dyn serialport::SerialPort>, tx: &crossbeam_channel::Sender<ControllerMessage>) {
+fn exhaust_buffer(
+    port: &mut Box<dyn serialport::SerialPort>,
+    tx: &crossbeam_channel::Sender<ControllerMessage>,
+) {
     // Exhaust the initial buffer till we find the end of a report and consume it.
     // This is caused by a UB in Windows' COM port handling causing partial reports
     // sometimes

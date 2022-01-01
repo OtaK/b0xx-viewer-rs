@@ -11,12 +11,10 @@ pub enum B0xxReport {
     Invalid = 0x00,
 }
 
+#[allow(clippy::from_over_into)]
 impl Into<bool> for B0xxReport {
     fn into(self) -> bool {
-        match self {
-            B0xxReport::On => true,
-            _ => false,
-        }
+        matches!(self, B0xxReport::On)
     }
 }
 
@@ -124,7 +122,6 @@ impl From<[B0xxReport; 25]> for ControllerState {
     }
 }
 
-#[cfg(feature = "gilrs_backend")]
 impl ControllerState {
     // Ref: https://github.com/project-slippi/Ishiiruka/blob/slippi/Data/Sys/Config/Profiles/GCPad/B0XX.ini
     // Ref: https://github.com/project-slippi/Ishiiruka/blob/slippi/Data/Sys/Config/Profiles/GCPad/B0XX_Linux.ini
@@ -132,16 +129,14 @@ impl ControllerState {
     pub(crate) fn from_b0xx_gilrs(state: &gilrs::ev::state::GamepadState) -> Self {
         let mut c_state = Self::default();
 
-        let axis_iter = state
-            .axes()
-            .filter_map(|(code, data)| {
-                let code = code.into_u32();
-                if (0..=4).contains(&code) {
-                    Some((code, data.value()))
-                } else {
-                    None
-                }
-            });
+        let axis_iter = state.axes().filter_map(|(code, data)| {
+            let code = code.into_u32();
+            if (0..=4).contains(&code) {
+                Some((code, data.value()))
+            } else {
+                None
+            }
+        });
 
         // TODO: Deduct ModX/Y state from coords
         for (axis_code, value) in axis_iter {
@@ -160,16 +155,14 @@ impl ControllerState {
             }
         }
 
-        let buttons_iter = state
-            .buttons()
-            .filter_map(|(code, data)| {
-                let code = code.into_u32();
-                if (0..=11).contains(&code) {
-                    Some((code, data.is_pressed()))
-                } else {
-                    None
-                }
-            });
+        let buttons_iter = state.buttons().filter_map(|(code, data)| {
+            let code = code.into_u32();
+            if (0..=11).contains(&code) {
+                Some((code, data.is_pressed()))
+            } else {
+                None
+            }
+        });
 
         for (button_code, is_pressed) in buttons_iter {
             match button_code {
@@ -185,22 +178,22 @@ impl ControllerState {
                     c_state.mod_x = true;
                     c_state.mod_y = true;
                     c_state.c_left = true;
-                },
+                }
                 9 if is_pressed => {
                     c_state.mod_x = true;
                     c_state.mod_y = true;
                     c_state.c_up = true;
-                },
+                }
                 10 if is_pressed => {
                     c_state.mod_x = true;
                     c_state.mod_y = true;
                     c_state.c_right = true;
-                },
+                }
                 11 if is_pressed => {
                     c_state.mod_x = true;
                     c_state.mod_y = true;
                     c_state.c_down = true;
-                },
+                }
                 _ => continue,
             }
         }

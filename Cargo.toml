@@ -31,7 +31,7 @@ rusttype = "0.8"
 
 # Other
 crossbeam-channel = "0.5"
-clap = "2.33"
+clap = { version = "3.0", features = ["derive"] }
 lazy_static = "1.4"
 serde = { version = "1.0", features = ["derive"] }
 toml = "0.5"
@@ -39,13 +39,13 @@ rgb = { version = "0.8", features = ["serde"] }
 anyhow = "1.0"
 thiserror = "1.0"
 backoff = "0.4"
-chrono = "0.4"
+time = { version = "0.3", features = ["formatting"] }
 
-# Input polling backends, feature-gated
-serialport = { version = "4.0", optional = true }
-gilrs = { version = "0.8", optional = true }
+# Input polling backends
+gilrs = "0.8"
+serialport = "4.0"
 
-# fake_serial feature
+# fake_inputs feature
 rand = { version = "0.8", optional = true }
 
 # fps feature
@@ -55,12 +55,10 @@ fps_counter = { version = "2.0", optional = true }
 winres = "0.1"
 
 [features]
-default = ["gilrs_backend"]
-gilrs_backend = ["gilrs"]
-serial_backend = ["serialport"]
-fake_serial = ["rand"]
+default = []
+fake_inputs = ["rand"]
 fps = ["fps_counter"]
-benchmark = ["fake_serial", "fps"]
+benchmark = ["fake_inputs", "fps"]
 win_console = []
 
 [profile.release]

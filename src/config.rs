@@ -7,23 +7,12 @@ use serde::{Deserialize, Serialize};
 pub enum ConfigError {
     #[error("The supplied config path could not be found on the filesystem.")]
     NotFound,
+    #[error("The supplied hexadecimal color has an invalid format. Correct format is, for example, #FF22BB")]
+    InvalidHexColor,
     #[error("DeserializationError: {0}")]
     DeserializationError(#[from] toml::de::Error),
     #[error("SerializationError: {0}")]
     SerializationError(#[from] toml::ser::Error),
-}
-
-#[macro_export]
-macro_rules! hex_to_color {
-    ($v:expr) => {{
-        let (r, g, b) = (
-            (($v >> 16) & 255) as u8,
-            (($v >> 8) & 255) as u8,
-            ($v & 255) as u8,
-        );
-
-        conrod_core::color::rgb_bytes(r, g, b).into()
-    }};
 }
 
 pub const DEFAULT_FILENAME: &str = "parallelograph_viewer_config.toml";
@@ -46,6 +35,10 @@ pub enum ViewerColorType {
 pub struct ViewerColor(rgb::RGB8);
 
 impl ViewerColor {
+    pub fn new(r: u8, g: u8, b: u8) -> Self {
+        Self(rgb::RGB8::new(r, g, b))
+    }
+
     fn active_default() -> Self {
         *DEFAULT_ACTIVE_COLOR
     }
@@ -77,6 +70,7 @@ impl From<Color> for ViewerColor {
     }
 }
 
+#[allow(clippy::from_over_into)]
 impl Into<Color> for ViewerColor {
     fn into(self) -> Color {
         Color::Rgba(
@@ -254,6 +248,8 @@ pub struct ViewerOptions {
     pub is_r2_b0xx: bool,
     #[serde(default)]
     pub colored_rims: bool,
+    #[serde(default)]
+    pub joystick_api_backend: bool,
     pub custom_tty: Option<String>,
     #[serde(skip)]
     path: std::path::PathBuf,
@@ -270,6 +266,7 @@ impl Default for ViewerOptions {
             custom_tty: None,
             is_r2_b0xx: true,
             colored_rims: false,
+            joystick_api_backend: false,
             path: Default::default(),
         }
     }

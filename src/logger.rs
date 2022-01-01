@@ -7,9 +7,7 @@ pub struct Logger {
 
 impl Logger {
     pub fn new() -> Self {
-        Self {
-            has_init: false,
-        }
+        Self { has_init: false }
     }
 
     pub fn init(&mut self) {
@@ -52,12 +50,15 @@ fn stdout() -> fern::Dispatch {
 fn filelog() -> fern::Dispatch {
     let mut logpath = std::env::current_exe().unwrap();
     let _ = logpath.set_extension("log");
+    let time_format = time::format_description::well_known::Rfc3339;
 
     fern::Dispatch::new()
-        .format(|out, message, record| {
+        .format(move |out, message, record| {
             out.finish(format_args!(
                 "[{}][{}][{}] > {}",
-                chrono::Local::now().format("%Y-%m-%dT%H:%M:%S"),
+                time::OffsetDateTime::now_utc()
+                    .format(&time_format)
+                    .unwrap(),
                 record.level(),
                 record.target(),
                 message,

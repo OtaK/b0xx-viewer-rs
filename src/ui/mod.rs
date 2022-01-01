@@ -7,8 +7,8 @@ use self::{app::*, support::*};
 use crate::{config::ViewerOptions, probe::*};
 
 use conrod_core::widget_ids;
-use glium::{self, Surface, glutin::event::ModifiersState};
 use conrod_glium::Renderer;
+use glium::{self, glutin::event::ModifiersState, Surface};
 
 const ALATA_FONT: &[u8] = include_bytes!("../../assets/fonts/Alata-Regular.ttf");
 
@@ -68,7 +68,11 @@ widget_ids! {
     }
 }
 
-pub fn start_gui(mut rx: crossbeam_channel::Receiver<ControllerMessage>, options: ViewerOptions) {
+pub fn start_gui(
+    probe: &mut Box<dyn ControllerProbe>,
+    mut rx: crossbeam_channel::Receiver<ControllerMessage>,
+    options: ViewerOptions,
+) {
     // Build the window.
     let mut events_loop = glium::glutin::event_loop::EventLoop::new();
 
@@ -79,7 +83,7 @@ pub fn start_gui(mut rx: crossbeam_channel::Receiver<ControllerMessage>, options
         .with_inner_size::<glium::glutin::dpi::LogicalSize<u32>>((WIN_W, WIN_H).into());
 
     let context = glium::glutin::ContextBuilder::new()
-        .with_vsync(true)
+        .with_vsync(cfg!(not(feature = "benchmark")))
         .with_gl_robustness(if cfg!(profile = "release") {
             glium::glutin::Robustness::NoError
         } else {
@@ -116,15 +120,14 @@ pub fn start_gui(mut rx: crossbeam_channel::Receiver<ControllerMessage>, options
     let (glutin_tx, glutin_rx) = crossbeam_channel::bounded::<()>(1);
 
     'main: loop {
-        // FIXME: Fix this after the traits are fixed
         // Reconnect to the device if needed
-        // if app.status == ViewerAppStatus::NeedsReconnection {
-        //     app.status = ViewerAppStatus::Reconnecting;
-        //     debug!("Trying to reconnect...");
-        //     drop(rx);
-        //     rx = reconnect(&options.custom_tty);
-        //     debug!("Reconnected successfully!");
-        // }
+        if app.status == ViewerAppStatus::NeedsReconnection {
+            app.status = ViewerAppStatus::Reconnecting;
+            debug!("Trying to reconnect...");
+            drop(rx);
+            rx = probe.reconnect().unwrap();
+            debug!("Reconnected successfully!");
+        }
 
         let mut maybe_state = match rx.iter().next() {
             Some(message) => match message {
@@ -172,7 +175,7 @@ pub fn start_gui(mut rx: crossbeam_channel::Receiver<ControllerMessage>, options
                         ..
                     } => {
                         let _ = glutin_tx.send(());
-                    },
+                    }
                     // If ALT is held, allow the window to be click-dragged
                     glium::glutin::event::WindowEvent::ModifiersChanged(modifiers) => {
                         if modifiers.contains(ModifiersState::ALT) {
@@ -181,40 +184,40 @@ pub fn start_gui(mut rx: crossbeam_channel::Receiver<ControllerMessage>, options
                             app.is_draggable = false;
                             app.is_dragged = false;
                         }
-                    },
+                    }
                     glium::glutin::event::WindowEvent::MouseInput {
                         button: glium::glutin::event::MouseButton::Left,
                         state,
                         ..
                     } if app.is_draggable => {
                         app.is_dragged = state == glium::glutin::event::ElementState::Pressed;
-                    },
+                    }
                     _ => {}
                 },
                 glium::glutin::event::Event::DeviceEvent {
-                    event: glium::glutin::event::DeviceEvent::MouseMotion { delta: (dx, dy)},
+                    event: glium::glutin::event::DeviceEvent::MouseMotion { delta: (dx, dy) },
                     ..
                 } if app.is_dragged => {
-                    let prev_pos = display.0
+                    let prev_pos = display
+                        .0
                         .gl_window()
                         .window()
                         .outer_position()
                         .unwrap_or_else(|_| glium::glutin::dpi::PhysicalPosition::new(0, 0));
 
-                    display.0
-                        .gl_window()
-                        .window()
-                        .set_outer_position(glium::glutin::dpi::PhysicalPosition::new(
+                    display.0.gl_window().window().set_outer_position(
+                        glium::glutin::dpi::PhysicalPosition::new(
                             prev_pos.x as f64 + dx,
                             prev_pos.y as f64 + dy,
-                        ));
-                },
+                        ),
+                    );
+                }
                 _ => {}
             }
             *control_flow = glium::glutin::event_loop::ControlFlow::Exit;
         });
 
-        if let Ok(_) = glutin_rx.try_recv() {
+        if glutin_rx.try_recv().is_ok() {
             break 'main;
         }
 
