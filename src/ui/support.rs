@@ -6,7 +6,7 @@ pub const BTN_RADIUS: f64 = 40.;
 pub const WIN_TITLE: &str = "Parallelograph Input Viewer - by @OtaK_";
 
 #[cfg(feature = "fake_inputs")]
-pub const WIN_TITLE: &str = "Parallelograph Input Viewer - by @OtaK_ [FAKE SERIAL MODE]";
+pub const WIN_TITLE: &str = "Parallelograph Input Viewer - by @OtaK_ [FAKE INPUTS MODE]";
 
 pub struct GliumDisplayWinitWrapper(pub glium::Display);
 
