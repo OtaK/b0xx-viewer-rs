@@ -109,19 +109,40 @@ impl ControllerState {
             }
         });
 
-        // TODO: Deduct ModX/Y state from coords
         for (axis_code, value) in axis_iter {
             match axis_code {
-                0 if value > 0. => c_state.right = true,
-                0 if value < 0. => c_state.left = true,
-                1 if value > 0. => c_state.up = true,
-                1 if value < 0. => c_state.down = true,
+                0 => {
+                    if value > 0. {
+                        c_state.right = true;
+                    } else if value < 0. {
+                        c_state.left = true;
+                    }
+
+                    match value.abs() as u16 {
+                        1..=7000 => c_state.mod_y |= true,
+                        7001..=14000 => c_state.mod_x |= true,
+                        _ => {}
+                    }
+                }
+                1 => {
+                    if value > 0. {
+                        c_state.up = true;
+                    } else if value < 0. {
+                        c_state.down = true;
+                    }
+
+                    match value.abs() as u16 {
+                        1..=12000 => c_state.mod_x |= true,
+                        12001..=16000 => c_state.mod_y |= true,
+                        _ => {}
+                    }
+                }
                 2 if value > 0. => c_state.c_up = true,
                 2 if value < 0. => c_state.c_down = true,
                 3 if value > 0. => c_state.c_right = true,
                 3 if value < 0. => c_state.c_left = true,
-                4 if value > 45. => c_state.mod_ms = true,
-                4 if value > 10. => c_state.mod_ls = true,
+                4 if value > 24000. => c_state.mod_ms = true,
+                4 if value > 12000. => c_state.mod_ls = true,
                 _ => continue,
             }
         }
