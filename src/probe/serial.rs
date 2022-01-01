@@ -1,4 +1,5 @@
 use crate::controllers::{b0xx::*, ControllerState};
+use super::ControllerMessage;
 use crate::error::ViewerError;
 use lazy_static::lazy_static;
 use serde::{Deserialize, Serialize};
@@ -39,15 +40,6 @@ lazy_static! {
             .map(|s_def| UsbDefinition::try_from(s_def).unwrap())
             .collect()
     };
-}
-
-#[cfg_attr(feature = "fake_serial", allow(dead_code))]
-#[derive(Debug)]
-pub enum ControllerMessage {
-    State(ControllerState),
-    Error(ViewerError),
-    Reconnect,
-    Quit,
 }
 
 #[inline]

@@ -4,6 +4,10 @@ pub enum ViewerError {
     ControllerNotFound,
     #[error("IoError: {0}")]
     IoError(#[from] std::io::Error),
+    #[cfg(feature = "gilrs_backend")]
+    #[error(transparent)]
+    GilrsError(#[from] gilrs::Error),
+    #[cfg(feature = "serial_backend")]
     #[error(transparent)]
     SerialPortError(#[from] serialport::Error),
     #[error("Internal serial thread error: {0}")]
@@ -17,3 +21,5 @@ pub enum ViewerError {
     #[error("An unknown error occured, sorry")]
     UnknownError,
 }
+
+pub type ViewerResult<T> = Result<T, ViewerError>;

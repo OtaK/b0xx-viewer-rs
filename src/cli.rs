@@ -62,20 +62,20 @@ pub fn cli_options() -> ViewerOptions {
         ret.colored_rims = true;
     }
 
-    if let Some(tty) = matches.value_of("tty").take() {
-        if let Ok(ports) = serialport::available_ports() {
-            ret.custom_tty = ports
-                .into_iter()
-                .find(|p| p.port_name == tty)
-                .map(move |_| String::from(tty));
+    // if let Some(tty) = matches.value_of("tty").take() {
+    //     if let Ok(ports) = serialport::available_ports() {
+    //         ret.custom_tty = ports
+    //             .into_iter()
+    //             .find(|p| p.port_name == tty)
+    //             .map(move |_| String::from(tty));
 
-            if ret.custom_tty.is_none() {
-                error!("Provided port not found or not connected to system");
-            }
-        } else {
-            error!("No ports available on the system, cannot lookup");
-        }
-    }
+    //         if ret.custom_tty.is_none() {
+    //             error!("Provided port not found or not connected to system");
+    //         }
+    //     } else {
+    //         error!("No ports available on the system, cannot lookup");
+    //     }
+    // }
 
     if let Some(Ok(bg)) = matches
         .value_of("bg_color")

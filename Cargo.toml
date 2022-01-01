@@ -17,33 +17,47 @@ name = "parallelograph_viewer"
 path = "src/main.rs"
 
 [dependencies]
-serialport = "4.0"
+# Logging
 log = "0.4"
-rand = { version = "0.8", optional = true }
+fern = { version = "0.6", features = ["colored"] }
+
+# GUI
 conrod_core = "0.76"
 conrod_winit = "0.76"
 conrod_glium = "0.76"
 winit = "0.26"
 glium = "0.28"
+rusttype = "0.8"
+
+# Other
 crossbeam-channel = "0.5"
 clap = "2.33"
 lazy_static = "1.4"
-fps_counter = { version = "2.0", optional = true }
-rusttype = "0.8"
 serde = { version = "1.0", features = ["derive"] }
 toml = "0.5"
 rgb = { version = "0.8", features = ["serde"] }
 anyhow = "1.0"
 thiserror = "1.0"
 backoff = "0.4"
-fern = { version = "0.6", features = ["colored"] }
 chrono = "0.4"
+
+# Input polling backends, feature-gated
+serialport = { version = "4.0", optional = true }
+gilrs = { version = "0.8", optional = true }
+
+# fake_serial feature
+rand = { version = "0.8", optional = true }
+
+# fps feature
+fps_counter = { version = "2.0", optional = true }
 
 [target.'cfg(windows)'.build-dependencies]
 winres = "0.1"
 
 [features]
-default = []
+default = ["gilrs_backend"]
+gilrs_backend = ["gilrs"]
+serial_backend = ["serialport"]
 fake_serial = ["rand"]
 fps = ["fps_counter"]
 benchmark = ["fake_serial", "fps"]

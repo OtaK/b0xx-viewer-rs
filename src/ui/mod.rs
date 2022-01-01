@@ -4,7 +4,7 @@ mod support;
 
 use self::{app::*, support::*};
 
-use crate::{config::ViewerOptions, serial_probe::*};
+use crate::{config::ViewerOptions, probe::*};
 
 use conrod_core::widget_ids;
 use glium::{self, Surface, glutin::event::ModifiersState};
@@ -116,14 +116,15 @@ pub fn start_gui(mut rx: crossbeam_channel::Receiver<ControllerMessage>, options
     let (glutin_tx, glutin_rx) = crossbeam_channel::bounded::<()>(1);
 
     'main: loop {
+        // FIXME: Fix this after the traits are fixed
         // Reconnect to the device if needed
-        if app.status == ViewerAppStatus::NeedsReconnection {
-            app.status = ViewerAppStatus::Reconnecting;
-            debug!("Trying to reconnect...");
-            drop(rx);
-            rx = reconnect(&options.custom_tty);
-            debug!("Reconnected successfully!");
-        }
+        // if app.status == ViewerAppStatus::NeedsReconnection {
+        //     app.status = ViewerAppStatus::Reconnecting;
+        //     debug!("Trying to reconnect...");
+        //     drop(rx);
+        //     rx = reconnect(&options.custom_tty);
+        //     debug!("Reconnected successfully!");
+        // }
 
         let mut maybe_state = match rx.iter().next() {
             Some(message) => match message {

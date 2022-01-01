@@ -8,7 +8,7 @@ mod cli;
 #[macro_use]
 mod config;
 mod error;
-mod serial_probe;
+mod probe;
 mod ui;
 mod logger;
 
@@ -26,14 +26,15 @@ pub fn main() {
 
     let options = cli::cli_options();
 
-    let rx = match serial_probe::start_serial_probe(&options.custom_tty) {
-        Ok(rx) => rx,
-        Err(e) => {
-            error!("{}", e);
-            return;
-        }
-    };
+    // let rx = match serial_probe::start_serial_probe(&options.custom_tty) {
+    //     Ok(rx) => rx,
+    //     Err(e) => {
+    //         error!("{}", e);
+    //         return;
+    //     }
+    // };
 
     info!("Serial probe up and running");
-    ui::start_gui(rx, options)
+    // FIXME: Uh oh everything broke
+    // ui::start_gui(rx, options)
 }

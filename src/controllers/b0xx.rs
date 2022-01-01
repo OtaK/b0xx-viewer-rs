@@ -123,3 +123,85 @@ impl From<[B0xxReport; 25]> for ControllerState {
         }
     }
 }
+
+#[cfg(feature = "gilrs_backend")]
+impl ControllerState {
+    pub(crate) fn from_b0xx_gilrs(state: &gilrs::ev::state::GamepadState) -> Self {
+        let mut c_state = Self::default();
+
+        let axis_iter = state
+            .axes()
+            .filter_map(|(code, data)| {
+                let code = code.into_u32();
+                if (0..=4).contains(&code) {
+                    Some((code, data.value()))
+                } else {
+                    None
+                }
+            });
+
+        // TODO: Deduct ModX/Y state from coords
+        for (axis_code, value) in axis_iter {
+            match axis_code {
+                0 if value > 0. => c_state.right = true,
+                0 if value < 0. => c_state.left = true,
+                1 if value > 0. => c_state.up = true,
+                1 if value < 0. => c_state.down = true,
+                2 if value > 0. => c_state.c_right = true,
+                2 if value < 0. => c_state.c_left = true,
+                3 if value > 0. => c_state.c_up = true,
+                3 if value < 0. => c_state.c_down = true,
+                4 if value > 45. => c_state.mod_ms = true,
+                4 if value > 10. => c_state.mod_ls = true,
+                _ => continue,
+            }
+        }
+
+        let buttons_iter = state
+            .buttons()
+            .filter_map(|(code, data)| {
+                let code = code.into_u32();
+                if (0..=11).contains(&code) {
+                    Some((code, data.is_pressed()))
+                } else {
+                    None
+                }
+            });
+
+        for (button_code, is_pressed) in buttons_iter {
+            match button_code {
+                0 => c_state.a = is_pressed,
+                1 => c_state.b = is_pressed,
+                2 => c_state.x = is_pressed,
+                3 => c_state.y = is_pressed,
+                4 => c_state.z = is_pressed,
+                5 => c_state.l = is_pressed,
+                6 => c_state.r = is_pressed,
+                7 => c_state.start = is_pressed,
+                8 if is_pressed => {
+                    c_state.mod_x = true;
+                    c_state.mod_y = true;
+                    c_state.c_left = true;
+                },
+                9 if is_pressed => {
+                    c_state.mod_x = true;
+                    c_state.mod_y = true;
+                    c_state.c_up = true;
+                },
+                10 if is_pressed => {
+                    c_state.mod_x = true;
+                    c_state.mod_y = true;
+                    c_state.c_right = true;
+                },
+                11 if is_pressed => {
+                    c_state.mod_x = true;
+                    c_state.mod_y = true;
+                    c_state.c_down = true;
+                },
+                _ => continue,
+            }
+        }
+
+        c_state
+    }
+}
