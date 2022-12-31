@@ -1,5 +1,8 @@
 name: Handle Release
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+
 on:
   release:
     types: [created]
@@ -13,25 +16,17 @@ jobs:
       matrix:
         os: [macos-latest, windows-latest, ubuntu-latest]
     steps:
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@v3
       - name: Dependencies (Linux)
         if: matrix.os == 'ubuntu-latest'
         run: sudo apt-get update && sudo apt-get install -y libudev-dev libxcb-shape0-dev libxcb-xfixes0-dev
       - name: Install minimal stable Rust
-        uses: actions-rs/toolchain@v1
-        with:
-          profile: minimal
-          toolchain: stable
+        uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
       - name: Run build
-        uses: actions-rs/cargo@v1
-        with:
-          command: build
-          args: --release
+        run: cargo build --release
       - name: Run tests
-        uses: actions-rs/cargo@v1
-        with:
-          command: test
-          args: --release
+        run: cargo test --release
       - name: Move/rename executable (Linux)
         if: matrix.os == 'ubuntu-latest'
         run: |
@@ -47,7 +42,7 @@ jobs:
           mv target/release/b0xx_viewer.exe b0xx_viewer_windows_${{ github.event.release.tag_name }}.exe
       - name: Upload Release Asset (Linux)
         if: matrix.os == 'ubuntu-latest'
-        uses: actions/upload-release-asset@v1.0.1
+        uses: shogo82148/actions-upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
@@ -57,7 +52,7 @@ jobs:
           asset_content_type: application/zip
       - name: Upload Release Asset (Windows)
         if: matrix.os == 'windows-latest'
-        uses: actions/upload-release-asset@v1.0.1
+        uses: shogo82148/actions-upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
@@ -67,7 +62,7 @@ jobs:
           asset_content_type: application/zip
       - name: Upload Release Asset (macOS)
         if: matrix.os == 'macos-latest'
-        uses: actions/upload-release-asset@v1.0.1
+        uses: shogo82148/actions-upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:

@@ -1,12 +1,9 @@
 #[cfg(windows)]
-extern crate winres;
-
-#[cfg(windows)]
 fn main() {
-    let mut res = winres::WindowsResource::new();
+    let mut res = winresource::WindowsResource::new();
     res.set_icon("assets/B0XX.ico");
     res.compile().unwrap();
 }
 
-#[cfg(unix)]
+#[cfg(not(windows))]
 fn main() {}

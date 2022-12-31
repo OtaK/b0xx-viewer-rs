@@ -1,22 +1,19 @@
 #![cfg_attr(not(feature = "win_console"), windows_subsystem = "windows")]
 
-#[macro_use]
-extern crate log;
-
 mod b0xx_state;
-mod cli;
-#[macro_use]
+mod colors;
 mod config;
 mod error;
+pub use self::error::*;
 mod serial_probe;
 mod ui;
 mod logger;
 
 pub use self::error::*;
 
-pub fn main() {
+pub fn main() -> ViewerResult<()> {
     if let Ok(env) = std::env::var("RUST_LOG") {
-        std::env::set_var("RUST_LOG", format!("b0xx_viewer=info,{}", env));
+        std::env::set_var("RUST_LOG", format!("b0xx_viewer=info,{env}"));
     } else {
         std::env::set_var("RUST_LOG", "b0xx_viewer=info");
     }
@@ -24,16 +21,13 @@ pub fn main() {
     let mut logger = logger::Logger::new();
     logger.init();
 
-    let options = cli::cli_options();
-
-    let rx = match serial_probe::start_serial_probe(&options.custom_tty) {
-        Ok(rx) => rx,
-        Err(e) => {
-            error!("{}", e);
-            return;
-        }
+    let Some(options) = config::ViewerOptions::run()? else {
+        std::process::exit(0);
     };
 
-    info!("Serial probe up and running");
-    ui::start_gui(rx, options)
+    let rx = serial_probe::start_serial_probe(&options.custom_tty)?;
+
+    log::info!("Serial probe up and running");
+    ui::start_gui(rx, options);
+    Ok(())
 }

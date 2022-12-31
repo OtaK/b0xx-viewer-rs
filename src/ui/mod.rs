@@ -79,7 +79,7 @@ pub fn start_gui(mut rx: crossbeam_channel::Receiver<B0xxMessage>, options: View
         .with_inner_size::<glium::glutin::dpi::LogicalSize<u32>>((WIN_W, WIN_H).into());
 
     let context = glium::glutin::ContextBuilder::new()
-        .with_vsync(true)
+        .with_vsync(cfg!(not(feature = "benchmark")))
         .with_gl_robustness(if cfg!(profile = "release") {
             glium::glutin::Robustness::NoError
         } else {
@@ -89,6 +89,8 @@ pub fn start_gui(mut rx: crossbeam_channel::Receiver<B0xxMessage>, options: View
 
     let display = glium::Display::new(window, context, &events_loop).unwrap();
     let display = GliumDisplayWinitWrapper(display);
+
+    let mut scale_factor = display.0.gl_window().window().scale_factor();
 
     // Construct our `Ui`.
     let mut ui = conrod_core::UiBuilder::new([WIN_W as f64, WIN_H as f64])
@@ -118,10 +120,10 @@ pub fn start_gui(mut rx: crossbeam_channel::Receiver<B0xxMessage>, options: View
         // Reconnect to the device if needed
         if app.status == ViewerAppStatus::NeedsReconnection {
             app.status = ViewerAppStatus::Reconnecting;
-            debug!("Trying to reconnect...");
+            log::debug!("Trying to reconnect...");
             drop(rx);
             rx = reconnect(&options.custom_tty);
-            debug!("Reconnected successfully!");
+            log::debug!("Reconnected successfully!");
         }
 
         let mut maybe_state = match rx.iter().next() {
@@ -131,7 +133,7 @@ pub fn start_gui(mut rx: crossbeam_channel::Receiver<B0xxMessage>, options: View
                     Some(state)
                 }
                 B0xxMessage::Error(e) => {
-                    error!("{}", e);
+                    log::error!("{}", e);
                     app.status = ViewerAppStatus::NeedsReconnection;
                     None
                 }
@@ -187,25 +189,29 @@ pub fn start_gui(mut rx: crossbeam_channel::Receiver<B0xxMessage>, options: View
                     } if app.is_draggable => {
                         app.is_dragged = state == glium::glutin::event::ElementState::Pressed;
                     },
+                    glium::glutin::event::WindowEvent::ScaleFactorChanged { scale_factor: new_scale_factor, .. } => {
+                        scale_factor = new_scale_factor;
+                    },
                     _ => {}
                 },
                 glium::glutin::event::Event::DeviceEvent {
-                    event: glium::glutin::event::DeviceEvent::MouseMotion { delta: (dx, dy)},
+                    event: glium::glutin::event::DeviceEvent::MouseMotion { delta: (dx, dy) },
                     ..
                 } if app.is_dragged => {
                     let prev_pos = display.0
                         .gl_window()
                         .window()
                         .outer_position()
-                        .unwrap_or_else(|_| glium::glutin::dpi::PhysicalPosition::new(0, 0));
+                        .unwrap_or_else(|_| glium::glutin::dpi::PhysicalPosition::new(0, 0))
+                        .to_logical::<f64>(scale_factor);
 
                     display.0
                         .gl_window()
                         .window()
-                        .set_outer_position(glium::glutin::dpi::PhysicalPosition::new(
-                            prev_pos.x as f64 + dx,
-                            prev_pos.y as f64 + dy,
-                        ));
+                        .set_outer_position(glium::glutin::dpi::LogicalPosition::new(
+                            prev_pos.x + dx,
+                            prev_pos.y + dy,
+                        ).to_physical::<f64>(scale_factor));
                 },
                 _ => {}
             }

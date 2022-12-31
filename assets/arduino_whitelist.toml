@@ -1,125 +1,125 @@
 # Arduino Yún
-[[arduino]]
+[[def]]
 vid = "0x2341"
 pid = "0x0041"
-[[arduino]]
+[[def]]
 vid = "0x2341"
 pid = "0x8041"
-[[arduino]]
+[[def]]
 vid = "0x2A03"
 pid = "0x0041"
-[[arduino]]
+[[def]]
 vid = "0x2A03"
 pid = "0x8041"
 
 # Linino One
-[[arduino]]
+[[def]]
 vid = "0x2a03"
 pid = "0x0001"
-[[arduino]]
+[[def]]
 vid = "0x2a03"
 pid = "0x8001"
 
 # Arduino/Genuino Uno
-[[arduino]]
+[[def]]
 vid = "0x2341"
 pid = "0x0043"
-[[arduino]]
+[[def]]
 vid = "0x2341"
 pid = "0x0001"
-[[arduino]]
+[[def]]
 vid = "0x2A03"
 pid = "0x0043"
-[[arduino]]
+[[def]]
 vid = "0x2341"
 pid = "0x0243"
 
 # Arduino/Genuino Mega or Mega 2560
-[[arduino]]
+[[def]]
 vid = "0x2341"
 pid = "0x0010"
-[[arduino]]
+[[def]]
 vid = "0x2341"
 pid = "0x0042"
-[[arduino]]
+[[def]]
 vid = "0x2A03"
 pid = "0x0010"
-[[arduino]]
+[[def]]
 vid = "0x2A03"
 pid = "0x0042"
-[[arduino]]
+[[def]]
 vid = "0x2341"
 pid = "0x0210"
-[[arduino]]
+[[def]]
 vid = "0x2341"
 pid = "0x0242"
 
 # Arduino Mega ADK
-[[arduino]]
+[[def]]
 vid = "0x2341"
 pid = "0x003f"
-[[arduino]]
+[[def]]
 vid = "0x2341"
 pid = "0x0044"
-[[arduino]]
+[[def]]
 vid = "0x2A03"
 pid = "0x003f"
-[[arduino]]
+[[def]]
 vid = "0x2A03"
 pid = "0x0044"
 
 # Arduino Leonardo
-[[arduino]]
+[[def]]
 vid = "0x2341"
 pid = "0x0036"
-[[arduino]]
+[[def]]
 vid = "0x2341"
 pid = "0x8036"
-[[arduino]]
+[[def]]
 vid = "0x2A03"
 pid = "0x0036"
-[[arduino]]
+[[def]]
 vid = "0x2A03"
 pid = "0x8036"
 
 # Arduino Leonardo ETH
-[[arduino]]
+[[def]]
 vid = "0x2a03"
 pid = "0x0040"
-[[arduino]]
+[[def]]
 vid = "0x2a03"
 pid = "0x8040"
 
 # Arduino / Genuino Micro
-[[arduino]]
+[[def]]
 vid = "0x2341"
 pid = "0x0037"
-[[arduino]]
+[[def]]
 vid = "0x2341"
 pid = "0x8037"
-[[arduino]]
+[[def]]
 vid = "0x2A03"
 pid = "0x0037"
-[[arduino]]
+[[def]]
 vid = "0x2A03"
 pid = "0x8037"
-[[arduino]]
+[[def]]
 vid = "0x2341"
 pid = "0x0237"
-[[arduino]]
+[[def]]
 vid = "0x2341"
 pid = "0x8237"
 
 # Arduino Esplora
-[[arduino]]
+[[def]]
 vid = "0x2341"
 pid = "0x003C"
-[[arduino]]
+[[def]]
 vid = "0x2341"
 pid = "0x803C"
-[[arduino]]
+[[def]]
 vid = "0x2A03"
 pid = "0x003C"
-[[arduino]]
+[[def]]
 vid = "0x2A03"
 pid = "0x803C"

@@ -14,11 +14,11 @@ Double click on the .exe file.
 
 #### Passing arguments to a .exe file
 
-If you wish to setup your input viewer (for example) to use the `--r2` start flag, enabling B0XX r2 buttons:
+If you wish to setup your input viewer (for example) to use the `--r1` start flag, disabling B0XX r2 buttons:
 
 * Right click on the .exe file, click on "Create shortcut"
 * On the newly created shortcut, right click, go to "Properties"
-* Add the desired flags after the full executable path in the "Target" field, like so:
+* Add the desired flags after the full executable path in the "Target" field, like so (due to changes, swap `--r2` to `--r1`):
 
 ![Properties Dialog](/assets/win_properties_dialog.png)
 
@@ -39,31 +39,37 @@ Try launching the executable with `--help` to get all the current options
 Note: This will not work on Windows because of platform restrictions
 
 ```text
-b0xx_viewer 0.6.0
-Mathieu Amiot <amiot.mathieu@gmail.com>
 GUI Viewer for B0XX controllers; particularly useful for streaming
 
-USAGE:
-    b0xx_viewer [FLAGS] [OPTIONS]
+Usage: b0xx_viewer.exe [OPTIONS]
 
-FLAGS:
-        --chromeless                 Makes the window chromeless
-        --colored_rims               Enables an alternative mode of inactive button coloring; Makes inactive button
-                                     background neutral in favor of button rims instead.
-    -h, --help                       Prints help information
-        --init_config                Intializes an empty configuration in the executable's folder
-    -l, --labels                     Enable button labels
-        --r2                         Enables B0XX r2 mode to account for the 2 extra buttons
-        --relax_arduino_detection    Relaxes B0XX detection to allow any 16MHz Arduino-compatible device to connect
-    -V, --version                    Prints version information
-
-OPTIONS:
-    -b, --background <bg_color>            Sets a custom background color in hex format, eg. "#00FF00"
-    -a, --active <btn_active_color>        Sets a custom color for pressed/active buttons in hex format, eg. "#00FF00"
-    -i, --inactive <btn_inactive_color>    Sets a custom color for inactive buttons in hex format, eg. "#00FF00"
-    -c, --config <config>                  Sets the configuration file path
-        --tty <tty>                        Provide a custom COM port (Windows-only) or a /dev/ttyXXX path (Unix).
-                                           Bypasses auto-detection, so proceed at your own risk!
+Options:
+      --init-config
+          Intializes an empty configuration in the executable's folder
+  -d, --labels
+          Enable button labels
+      --chromeless
+          Makes the window chromeless (i.e. removes window decorations such as titlebar, minimize/close buttons etc)
+      --r1
+          Enables B0XX r1 mode to remove the 2 extra buttons
+      --colored-rims
+          Enables an alternative mode of inactive button coloring; Makes inactive button background neutral in favor of button rims instead
+      --relax-arduino-detection
+          Relaxes B0XX detection to allow any 16MHz Arduino-compatible device to connect
+  -c, --config <CONFIG_PATH>
+          Sets the configuration file path
+  -b, --background <BACKGROUND_COLOR>
+          Sets a custom background color in hex format, eg. "#00FF00" [default: #131313]
+  -a, --active <BUTTON_ACTIVE_COLORS>
+          Sets a custom color for pressed/active buttons in hex format, eg. "#00FF00" [default: #00EBFF]
+  -i, --inactive <BUTTON_INACTIVE_COLORS>
+          Sets a custom color for inactive buttons in hex format, eg. "#00FF00" [default: #555753]
+      --tty <CUSTOM_TTY>
+          Provide a custom COM port (Windows-only) or a /dev/ttyXXX path (Unix). Bypasses auto-detection, so proceed at your own risk!
+  -h, --help
+          Print help
+  -V, --version
+          Print version
 
 ```
 
@@ -71,7 +77,7 @@ OPTIONS:
 
 A good example is in `cfg/gcc.toml`
 
-You can create your own configuration file by launching the program with the `--init_config` option, then modify it with your favorite text editor!
+You can create your own configuration file by launching the program with the `--init-config` option, then modify it with your favorite text editor!
 
 ## Building
 
@@ -82,11 +88,11 @@ Prequisites:
 
 Just `cargo build --release` and you should be good to go
 
-### Fake Serial Mode / Dev mode
+### Fake Inputs Mode / Dev mode
 
 There's a special feature that you can activate when building/running like so:
 
-`cargo {run|build} --features fake_serial [--release]`
+`cargo {run|build} --features fake_inputs [--release]`
 
 It'll simulate state reports with completely random ones spaced by 170ms.
 

@@ -1,11 +1,11 @@
 use crate::b0xx_state::*;
-use crate::error::ViewerError;
+use crate::error::{ViewerResult, ViewerError};
 use lazy_static::lazy_static;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 struct WhitelistFile {
-    arduino: Vec<UsbStringDef>,
+    def: Vec<UsbStringDef>,
 }
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 struct UsbStringDef {
@@ -29,19 +29,29 @@ impl std::convert::TryFrom<UsbStringDef> for UsbDefinition {
     }
 }
 
-const ARDUINO_WHITELIST_BYTES: &[u8] = include_bytes!("../assets/arduino_whitelist.toml");
+const ARDUINO_WHITELIST_BYTES: &str = include_str!("../assets/arduino_whitelist.toml");
+const B0XX_WHITELIST_BYTES: &str = include_str!("../assets/b0xx_whitelist.toml");
 lazy_static! {
     static ref ARDUINO_WHITELIST: Vec<UsbDefinition> = {
-        let res: WhitelistFile = toml::from_slice(ARDUINO_WHITELIST_BYTES).unwrap();
+        let res: WhitelistFile = toml::from_str(ARDUINO_WHITELIST_BYTES).unwrap();
         use std::convert::TryFrom as _;
-        res.arduino
+        res.def
+            .into_iter()
+            .map(|s_def| UsbDefinition::try_from(s_def).unwrap())
+            .collect()
+    };
+
+    static ref B0XX_WHITELIST: Vec<UsbDefinition> = {
+        let res: WhitelistFile = toml::from_str(B0XX_WHITELIST_BYTES).unwrap();
+        use std::convert::TryFrom as _;
+        res.def
             .into_iter()
             .map(|s_def| UsbDefinition::try_from(s_def).unwrap())
             .collect()
     };
 }
 
-#[cfg_attr(feature = "fake_serial", allow(dead_code))]
+#[cfg_attr(feature = "fake_inputs", allow(dead_code))]
 #[derive(Debug)]
 pub enum B0xxMessage {
     State(B0xxState),
@@ -65,10 +75,11 @@ pub fn reconnect(custom_tty: &Option<String>) -> crossbeam_channel::Receiver<B0x
     }
 }
 
-#[cfg(not(feature = "fake_serial"))]
+#[cfg(not(feature = "fake_inputs"))]
 pub fn start_serial_probe(
     custom_tty: &Option<String>,
-) -> Result<crossbeam_channel::Receiver<B0xxMessage>, ViewerError> {
+) -> ViewerResult<crossbeam_channel::Receiver<B0xxMessage>> {
+
     let b0xx_port = serialport::available_ports()?
         .into_iter()
         .find(move |port| {
@@ -84,7 +95,7 @@ pub fn start_serial_probe(
                     {
                         return true;
                     }
-                } else if portinfo.vid == 9025 && portinfo.pid == 32822 {
+                } else if B0XX_WHITELIST.iter().any(|def| def.vid == portinfo.vid && def.pid == portinfo.pid) {
                     return true;
                 }
 
@@ -99,7 +110,7 @@ pub fn start_serial_probe(
         })
         .ok_or_else(|| ViewerError::B0xxNotFound)?;
 
-    info!("Found B0XX on port {}", b0xx_port.port_name);
+    log::info!("Found B0XX on port {}", b0xx_port.port_name);
 
     let (tx, rx) = crossbeam_channel::bounded(1);
 
@@ -141,12 +152,12 @@ pub fn start_serial_probe(
                                 return tx.send(B0xxMessage::Reconnect);
                             }
                             _ => {
-                                error!("{:?}", e);
+                                log::error!("{e:?}");
                                 return tx.send(B0xxMessage::Quit);
                             }
                         },
                         _ => {
-                            error!("{:?}", e);
+                            log::error!("{e:?}");
                             return tx.send(B0xxMessage::Quit);
                         }
                     }
@@ -156,13 +167,13 @@ pub fn start_serial_probe(
                     return tx.send(B0xxMessage::Error(e.into()));
                 }
 
-                trace!("Bytes read: {}", bytes_read);
+                log::trace!("Bytes read: {bytes_read}");
 
                 port.consume(bytes_read);
                 if bytes_read == 25 {
                     let end_index = buf.iter().position(|item| *item == B0xxReport::End as u8).unwrap() - 4;
                     let start_index = end_index - 20;
-                    trace!("Selected range: {}..{}", start_index, end_index);
+                    log::trace!("Selected range: {start_index}..{end_index}");
 
                     for i in start_index..end_index {
                         state[i] = buf[i].into();
@@ -174,7 +185,7 @@ pub fn start_serial_probe(
                 buf.clear();
 
                 if tx.send(B0xxMessage::State(state.into())).is_err() {
-                    info!("Reconnection detected, exiting runloop");
+                    log::info!("Reconnection detected, exiting runloop");
                     return Ok(());
                 }
             }
@@ -183,18 +194,21 @@ pub fn start_serial_probe(
     Ok(rx)
 }
 
-#[cfg(feature = "fake_serial")]
+#[cfg(feature = "fake_inputs")]
 pub fn start_serial_probe(
     _: &Option<String>,
-) -> Result<crossbeam_channel::Receiver<B0xxMessage>, ViewerError> {
+) -> ViewerResult<crossbeam_channel::Receiver<B0xxMessage>> {
     let (tx, rx) = crossbeam_channel::bounded(1);
     if std::env::var("RELAX_ARDUINO_DETECT").is_ok() {
-        info!("{:#?}", *ARDUINO_WHITELIST)
+        log::info!("{:#?}", *ARDUINO_WHITELIST)
     }
+    use rand::SeedableRng as _;
+    let mut rng = rand::rngs::SmallRng::from_entropy();
+    let sleep_dur = std::time::Duration::from_micros(8700);
     std::thread::spawn(move || loop {
-        let _ = tx.send(B0xxMessage::State(B0xxState::random()));
+        let _ = tx.send(B0xxMessage::State(B0xxState::random(&mut rng)));
         #[cfg(not(feature = "benchmark"))]
-        std::thread::sleep(std::time::Duration::from_micros(16670));
+        std::thread::sleep(sleep_dur);
     });
 
     Ok(rx)
@@ -206,7 +220,7 @@ fn exhaust_buffer(port: &mut Box<dyn serialport::SerialPort>, tx: &crossbeam_cha
     // Exhaust the initial buffer till we find the end of a report and consume it.
     // This is caused by a UB in Windows' COM port handling causing partial reports
     // sometimes
-    trace!("Buffer exhaustion started");
+    log::trace!("Buffer exhaustion started");
     let mut exhaust_buffer = [0u8; 1];
     use std::io::Read as _;
     loop {
@@ -214,13 +228,13 @@ fn exhaust_buffer(port: &mut Box<dyn serialport::SerialPort>, tx: &crossbeam_cha
             .read_exact(&mut exhaust_buffer)
             .map_err(ViewerError::from)
         {
-            error!("{:?}", e);
+            log::error!("{:?}", e);
             let _ = tx.send(B0xxMessage::Quit);
             break;
         }
 
         if exhaust_buffer[0] == B0xxReport::End as u8 {
-            trace!("Buffer exhausted successfully, continuing...");
+            log::trace!("Buffer exhausted successfully, continuing...");
             break;
         }
     }
