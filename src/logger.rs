@@ -42,7 +42,6 @@ fn stdout() -> fern::Dispatch {
                 "[{target}] {level} > {message}",
                 level = colors.color(record.level()),
                 target = record.target(),
-                message = message,
             ))
         })
         .level(log::LevelFilter::Info)
@@ -56,11 +55,10 @@ fn filelog() -> fern::Dispatch {
     fern::Dispatch::new()
         .format(|out, message, record| {
             out.finish(format_args!(
-                "[{}][{}][{}] > {}",
-                chrono::Local::now().format("%Y-%m-%dT%H:%M:%S"),
-                record.level(),
-                record.target(),
-                message,
+                "[{time}][{level}][{target}] > {message}",
+                time = chrono::Local::now().format("%Y-%m-%dT%H:%M:%S"),
+                level = record.level(),
+                target = record.target(),
             ))
         })
         .level(log::LevelFilter::Debug)

@@ -1,6 +1,6 @@
 [package]
 name = "b0xx-viewer-rs"
-version = "0.6.0"
+version = "0.7.0"
 authors = ["Mathieu Amiot <amiot.mathieu@gmail.com>"]
 description = "GUI Viewer for B0XX controllers; particularly useful for streaming"
 edition = "2021"
@@ -9,7 +9,7 @@ license = "MIT/Apache-2.0"
 
 [package.metadata.winres]
 OriginalFilename = "b0xx_viewer.exe"
-LegalCopyright = "Copyright Mathieu \"@OtaK_\" Amiot © 2020"
+LegalCopyright = "Copyright Mathieu \"@OtaK_\" Amiot © 2023"
 ProductName = "B0XX Viewer"
 
 [[bin]]
@@ -19,34 +19,35 @@ path = "src/main.rs"
 [dependencies]
 serialport = "4.0"
 log = "0.4"
-rand = { version = "0.8", optional = true }
 conrod_core = "0.76"
 conrod_winit = "0.76"
 conrod_glium = "0.76"
 winit = "0.26"
 glium = "0.28"
 crossbeam-channel = "0.5"
-clap = "2.33"
+clap = { version = "4", features = ["derive"] }
 lazy_static = "1.4"
-fps_counter = { version = "2.0", optional = true }
 rusttype = "0.8"
 serde = { version = "1.0", features = ["derive"] }
-toml = "0.5"
+serde_with = { version = "3.1", default-features = false, features = ["macros"] }
+toml = { version = "0.7", features = ["preserve_order"] }
 rgb = { version = "0.8", features = ["serde"] }
 anyhow = "1.0"
 thiserror = "1.0"
 backoff = "0.4"
 fern = { version = "0.6", features = ["colored"] }
-chrono = "0.4"
+chrono = { version = "0.4", default-features = false, features = ["clock", "serde"] }
+rand = { version = "0.8", default-features = false, features = ["small_rng"], optional = true }
+fps_counter = { version = "2.0", optional = true }
 
 [target.'cfg(windows)'.build-dependencies]
-winres = "0.1"
+winresource = "0.1"
 
 [features]
 default = []
-fake_serial = ["rand"]
+fake_inputs = ["rand"]
 fps = ["fps_counter"]
-benchmark = ["fake_serial", "fps"]
+benchmark = ["fake_inputs", "fps"]
 win_console = []
 
 [profile.release]

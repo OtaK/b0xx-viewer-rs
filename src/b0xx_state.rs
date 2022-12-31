@@ -59,30 +59,33 @@ pub struct B0xxState {
     pub mod_ms: bool,
 }
 
-#[cfg(feature = "fake_serial")]
+#[cfg(feature = "fake_inputs")]
 impl B0xxState {
-    pub fn random() -> Self {
+    pub fn random(rng: &mut rand::rngs::SmallRng) -> Self {
+        use rand::RngCore as _;
+        let mut arr = [0u8; 20];
+        rng.fill_bytes(&mut arr);
         B0xxState {
-            start: rand::random::<bool>(),
-            y: rand::random::<bool>(),
-            x: rand::random::<bool>(),
-            b: rand::random::<bool>(),
-            a: rand::random::<bool>(),
-            l: rand::random::<bool>(),
-            r: rand::random::<bool>(),
-            z: rand::random::<bool>(),
-            up: rand::random::<bool>(),
-            down: rand::random::<bool>(),
-            right: rand::random::<bool>(),
-            left: rand::random::<bool>(),
-            mod_x: rand::random::<bool>(),
-            mod_y: rand::random::<bool>(),
-            c_left: rand::random::<bool>(),
-            c_right: rand::random::<bool>(),
-            c_up: rand::random::<bool>(),
-            c_down: rand::random::<bool>(),
-            mod_ls: rand::random::<bool>(),
-            mod_ms: rand::random::<bool>(),
+            start: arr[0] == 1,
+            y: arr[1] == 1,
+            x: arr[2] == 1,
+            b: arr[3] == 1,
+            a: arr[4] == 1,
+            l: arr[5] == 1,
+            r: arr[6] == 1,
+            z: arr[7] == 1,
+            up: arr[8] == 1,
+            down: arr[9] == 1,
+            right: arr[10] == 1,
+            left: arr[11] == 1,
+            mod_x: arr[12] == 1,
+            mod_y: arr[13] == 1,
+            c_left: arr[14] == 1,
+            c_right: arr[15] == 1,
+            c_up: arr[16] == 1,
+            c_down: arr[17] == 1,
+            mod_ls: arr[18] == 1,
+            mod_ms: arr[19] == 1,
         }
     }
 }

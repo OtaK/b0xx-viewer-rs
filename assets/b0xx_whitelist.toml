@@ -1,0 +1,19 @@
+# B0XX v1 & v2, based on Arduino Leonardo
+[[def]]
+vid = "0x2341"
+pid = "0x8036"
+
+# B0XX v3 I guess
+[[def]]
+vid = "0x2E8A"
+pid = "0x102F"
+
+# B0XX v4 via XInput (?)
+[[def]]
+vid = "0x045E"
+pid = "0x02A1"
+
+# B0XX v4 (?)
+[[def]]
+vid = "0x0738"
+pid = "0x4726"

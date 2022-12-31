@@ -419,7 +419,7 @@ pub fn render_gui(
             .set(ids.c_down_label, ui);
     }
 
-    if options.is_r2_b0xx {
+    if !options.is_r1_b0xx {
         let (btn, mut m_text) = make_button(
             app.state.mod_ls,
             ids.frame,
@@ -479,13 +479,12 @@ fn fps_counter(ui: &mut conrod_core::UiCell, ids: &Ids, app: &mut ViewerApp) {
         .set(ids.fps_counter, ui);
 }
 
-#[inline(always)]
 fn make_button(
     pressed: bool,
     parent: conrod_core::widget::Id,
-    active_color: crate::config::ViewerColor,
-    inactive_color: crate::config::ViewerColor,
-    background_color: crate::config::ViewerColor,
+    active_color: crate::colors::ViewerColor,
+    inactive_color: crate::colors::ViewerColor,
+    background_color: crate::colors::ViewerColor,
     display_labels: bool,
     colored_rims: bool,
 ) -> (
@@ -502,7 +501,7 @@ fn make_button(
         inactive_color
     };
     let text_color = if display_labels {
-        let tmp: conrod_core::Color = color.clone().into();
+        let tmp: conrod_core::Color = color.into();
         Some(tmp.plain_contrast())
     } else {
         None
