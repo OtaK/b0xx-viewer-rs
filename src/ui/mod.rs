@@ -7,8 +7,8 @@ use self::{app::*, support::*};
 use crate::{config::ViewerOptions, serial_probe::*};
 
 use conrod_core::widget_ids;
-use glium::{self, Surface, glutin::event::ModifiersState};
 use conrod_glium::Renderer;
+use glium::{self, Surface, glutin::event::ModifiersState};
 
 const ALATA_FONT: &[u8] = include_bytes!("../../assets/fonts/Alata-Regular.ttf");
 
@@ -80,7 +80,7 @@ pub fn start_gui(mut rx: crossbeam_channel::Receiver<B0xxMessage>, options: View
 
     let context = glium::glutin::ContextBuilder::new()
         .with_vsync(cfg!(not(feature = "benchmark")))
-        .with_gl_robustness(if cfg!(profile = "release") {
+        .with_gl_robustness(if cfg!(not(debug_assertions)) {
             glium::glutin::Robustness::NoError
         } else {
             glium::glutin::Robustness::TryRobustLoseContextOnReset
@@ -172,7 +172,7 @@ pub fn start_gui(mut rx: crossbeam_channel::Receiver<B0xxMessage>, options: View
                         ..
                     } => {
                         let _ = glutin_tx.send(());
-                    },
+                    }
                     // If ALT is held, allow the window to be click-dragged
                     glium::glutin::event::WindowEvent::ModifiersChanged(modifiers) => {
                         if modifiers.contains(ModifiersState::ALT) {
@@ -181,38 +181,39 @@ pub fn start_gui(mut rx: crossbeam_channel::Receiver<B0xxMessage>, options: View
                             app.is_draggable = false;
                             app.is_dragged = false;
                         }
-                    },
+                    }
                     glium::glutin::event::WindowEvent::MouseInput {
                         button: glium::glutin::event::MouseButton::Left,
                         state,
                         ..
                     } if app.is_draggable => {
                         app.is_dragged = state == glium::glutin::event::ElementState::Pressed;
-                    },
-                    glium::glutin::event::WindowEvent::ScaleFactorChanged { scale_factor: new_scale_factor, .. } => {
+                    }
+                    glium::glutin::event::WindowEvent::ScaleFactorChanged {
+                        scale_factor: new_scale_factor,
+                        ..
+                    } => {
                         scale_factor = new_scale_factor;
-                    },
+                    }
                     _ => {}
                 },
                 glium::glutin::event::Event::DeviceEvent {
                     event: glium::glutin::event::DeviceEvent::MouseMotion { delta: (dx, dy) },
                     ..
                 } if app.is_dragged => {
-                    let prev_pos = display.0
+                    let prev_pos = display
+                        .0
                         .gl_window()
                         .window()
                         .outer_position()
                         .unwrap_or_else(|_| glium::glutin::dpi::PhysicalPosition::new(0, 0))
                         .to_logical::<f64>(scale_factor);
 
-                    display.0
-                        .gl_window()
-                        .window()
-                        .set_outer_position(glium::glutin::dpi::LogicalPosition::new(
-                            prev_pos.x + dx,
-                            prev_pos.y + dy,
-                        ).to_physical::<f64>(scale_factor));
-                },
+                    display.0.gl_window().window().set_outer_position(
+                        glium::glutin::dpi::LogicalPosition::new(prev_pos.x + dx, prev_pos.y + dy)
+                            .to_physical::<f64>(scale_factor),
+                    );
+                }
                 _ => {}
             }
             *control_flow = glium::glutin::event_loop::ControlFlow::Exit;

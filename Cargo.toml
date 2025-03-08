@@ -3,7 +3,7 @@ name = "b0xx-viewer-rs"
 version = "0.7.1"
 authors = ["Mathieu Amiot <amiot.mathieu@gmail.com>"]
 description = "GUI Viewer for B0XX controllers; particularly useful for streaming"
-edition = "2021"
+edition = "2024"
 build = "build.rs"
 license = "MIT/Apache-2.0"
 

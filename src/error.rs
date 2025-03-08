@@ -1,6 +1,8 @@
 #[derive(Debug, thiserror::Error)]
 pub enum ViewerError {
-    #[error("A B0XX could not be found on your system. Are you sure it's connected through the USB port?")]
+    #[error(
+        "A B0XX could not be found on your system. Are you sure it's connected through the USB port?"
+    )]
     B0xxNotFound,
     #[error("IoError: {0}")]
     IoError(#[from] std::io::Error),

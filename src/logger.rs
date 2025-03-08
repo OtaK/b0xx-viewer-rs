@@ -7,9 +7,7 @@ pub struct Logger {
 
 impl Logger {
     pub fn new() -> Self {
-        Self {
-            has_init: false,
-        }
+        Self { has_init: false }
     }
 
     pub fn init(&mut self) {

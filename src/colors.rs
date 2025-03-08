@@ -12,7 +12,9 @@ pub enum ViewerColorType {
     Background,
 }
 
-#[derive(Debug, Clone, Copy, serde_with::SerializeDisplay, serde_with::DeserializeFromStr, PartialEq, Eq)]
+#[derive(
+    Debug, Clone, Copy, serde_with::SerializeDisplay, serde_with::DeserializeFromStr, PartialEq, Eq,
+)]
 
 pub struct ViewerColor(rgb::RGB8);
 

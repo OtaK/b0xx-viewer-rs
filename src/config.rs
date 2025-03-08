@@ -1,5 +1,5 @@
-use crate::{ViewerResult, ViewerOptionConfigError};
 use crate::colors::*;
+use crate::{ViewerOptionConfigError, ViewerResult};
 
 pub const DEFAULT_FILENAME: &str = "b0xx_viewer_config.toml";
 
@@ -63,7 +63,7 @@ pub struct ViewerOptions {
     /// Provide a custom COM port (Windows-only) or a /dev/ttyXXX path (Unix). Bypasses auto-detection, so proceed at your own risk!
     #[arg(long = "tty")]
     #[serde(rename = "tty")]
-    pub custom_tty: Option<String>
+    pub custom_tty: Option<String>,
 }
 
 impl Default for ViewerOptions {
@@ -128,8 +128,7 @@ impl ViewerOptions {
             Self::get_cwd()?
         };
 
-        let toml_output = toml::to_string_pretty(self)
-            .map_err(ViewerOptionConfigError::from)?;
+        let toml_output = toml::to_string_pretty(self).map_err(ViewerOptionConfigError::from)?;
         let _ = std::fs::write(path.clone(), toml_output.into_bytes())?;
         self.path = path;
         Ok(())
@@ -151,7 +150,10 @@ impl ViewerOptions {
         config.merge(cli_options);
 
         if let Some(tty) = config.custom_tty.take() {
-            config.custom_tty = serialport::available_ports()?.into_iter().find(|p| p.port_name == tty).map(move |_| String::from(tty));
+            config.custom_tty = serialport::available_ports()?
+                .into_iter()
+                .find(|p| p.port_name == tty)
+                .map(move |_| String::from(tty));
 
             if config.custom_tty.is_none() {
                 log::error!("Provided port not found or not connected to system");
@@ -160,7 +162,8 @@ impl ViewerOptions {
 
         // Side effect for the serial probe thread.
         if config.relax_arduino_detection {
-            std::env::set_var("RELAX_ARDUINO_DETECT", "true");
+            // TODO: Audit that the environment access only happens in single-threaded code.
+            unsafe { std::env::set_var("RELAX_ARDUINO_DETECT", "true") };
         }
 
         log::trace!("Configuration: {config:#?}");

@@ -1,5 +1,5 @@
 use crate::b0xx_state::*;
-use crate::error::{ViewerResult, ViewerError};
+use crate::error::{ViewerError, ViewerResult};
 use lazy_static::lazy_static;
 use serde::{Deserialize, Serialize};
 
@@ -40,7 +40,6 @@ lazy_static! {
             .map(|s_def| UsbDefinition::try_from(s_def).unwrap())
             .collect()
     };
-
     static ref B0XX_WHITELIST: Vec<UsbDefinition> = {
         let res: WhitelistFile = toml::from_str(B0XX_WHITELIST_BYTES).unwrap();
         use std::convert::TryFrom as _;
@@ -79,7 +78,6 @@ pub fn reconnect(custom_tty: &Option<String>) -> crossbeam_channel::Receiver<B0x
 pub fn start_serial_probe(
     custom_tty: &Option<String>,
 ) -> ViewerResult<crossbeam_channel::Receiver<B0xxMessage>> {
-
     let b0xx_port = serialport::available_ports()?
         .into_iter()
         .find(move |port| {
@@ -95,7 +93,10 @@ pub fn start_serial_probe(
                     {
                         return true;
                     }
-                } else if B0XX_WHITELIST.iter().any(|def| def.vid == portinfo.vid && def.pid == portinfo.pid) {
+                } else if B0XX_WHITELIST
+                    .iter()
+                    .any(|def| def.vid == portinfo.vid && def.pid == portinfo.pid)
+                {
                     return true;
                 }
 
@@ -127,12 +128,10 @@ pub fn start_serial_probe(
                 .stop_bits(serialport::StopBits::One)
                 .timeout(std::time::Duration::from_millis(500));
 
-            let mut port =
-                match port_builder.open() {
-                    Ok(port) => port,
-                    Err(e) => return tx.send(B0xxMessage::Error(e.into())),
-                };
-
+            let mut port = match port_builder.open() {
+                Ok(port) => port,
+                Err(e) => return tx.send(B0xxMessage::Error(e.into())),
+            };
 
             exhaust_buffer(&mut port, &tx);
 
@@ -144,7 +143,10 @@ pub fn start_serial_probe(
                     return tx.send(B0xxMessage::Error(e.into()));
                 }
 
-                let bytes_read: usize = match port.read_until(B0xxReport::End as u8, &mut buf).map_err(Into::into) {
+                let bytes_read: usize = match port
+                    .read_until(B0xxReport::End as u8, &mut buf)
+                    .map_err(Into::into)
+                {
                     Ok(bytes) => bytes,
                     Err(e) => match &e {
                         ViewerError::IoError(io_error) => match io_error.kind() {
@@ -160,7 +162,7 @@ pub fn start_serial_probe(
                             log::error!("{e:?}");
                             return tx.send(B0xxMessage::Quit);
                         }
-                    }
+                    },
                 };
 
                 if let Err(e) = port.get_mut().write_request_to_send(false) {
@@ -171,7 +173,11 @@ pub fn start_serial_probe(
 
                 port.consume(bytes_read);
                 if bytes_read == 25 {
-                    let end_index = buf.iter().position(|item| *item == B0xxReport::End as u8).unwrap() - 4;
+                    let end_index = buf
+                        .iter()
+                        .position(|item| *item == B0xxReport::End as u8)
+                        .unwrap()
+                        - 4;
                     let start_index = end_index - 20;
                     log::trace!("Selected range: {start_index}..{end_index}");
 
@@ -205,10 +211,12 @@ pub fn start_serial_probe(
     use rand::SeedableRng as _;
     let mut rng = rand::rngs::SmallRng::from_entropy();
     let sleep_dur = std::time::Duration::from_micros(8700);
-    std::thread::spawn(move || loop {
-        let _ = tx.send(B0xxMessage::State(B0xxState::random(&mut rng)));
-        #[cfg(not(feature = "benchmark"))]
-        std::thread::sleep(sleep_dur);
+    std::thread::spawn(move || {
+        loop {
+            let _ = tx.send(B0xxMessage::State(B0xxState::random(&mut rng)));
+            #[cfg(not(feature = "benchmark"))]
+            std::thread::sleep(sleep_dur);
+        }
     });
 
     Ok(rx)
@@ -216,7 +224,10 @@ pub fn start_serial_probe(
 
 #[allow(dead_code)]
 #[inline(always)]
-fn exhaust_buffer(port: &mut Box<dyn serialport::SerialPort>, tx: &crossbeam_channel::Sender<B0xxMessage>) {
+fn exhaust_buffer(
+    port: &mut Box<dyn serialport::SerialPort>,
+    tx: &crossbeam_channel::Sender<B0xxMessage>,
+) {
     // Exhaust the initial buffer till we find the end of a report and consume it.
     // This is caused by a UB in Windows' COM port handling causing partial reports
     // sometimes

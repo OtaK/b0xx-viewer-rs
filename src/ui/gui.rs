@@ -1,4 +1,4 @@
-use super::{app::*, Ids};
+use super::{Ids, app::*};
 use crate::config::ViewerOptions;
 use crate::ui::support::{BTN_RADIUS, WIN_H, WIN_W};
 
@@ -30,7 +30,7 @@ pub fn render_gui(
     app: &mut ViewerApp,
     options: &ViewerOptions,
 ) {
-    use conrod_core::{widget, Colorable, Positionable, Sizeable, Widget};
+    use conrod_core::{Colorable, Positionable, Sizeable, Widget, widget};
 
     // Compute button margin only if necessary
     let btn_label_margin = if options.display_labels {
@@ -469,7 +469,7 @@ fn fps_counter(_: &mut conrod_core::UiCell, _: &Ids, _: &mut ViewerApp) {}
 
 #[cfg(feature = "fps")]
 fn fps_counter(ui: &mut conrod_core::UiCell, ids: &Ids, app: &mut ViewerApp) {
-    use conrod_core::{color, widget, Colorable, Positionable, Widget};
+    use conrod_core::{Colorable, Positionable, Widget, color, widget};
 
     let fps = app.fps.tick();
     widget::Text::new(&fps.to_string())
@@ -491,7 +491,7 @@ fn make_button(
     conrod_core::widget::Oval<conrod_core::widget::primitive::shape::oval::Full>,
     Option<conrod_core::Color>,
 ) {
-    use conrod_core::{widget, Sizeable, Widget};
+    use conrod_core::{Sizeable, Widget, widget};
 
     let color = if pressed {
         active_color
@@ -512,16 +512,16 @@ fn make_button(
             BTN_RADIUS,
             widget::primitive::line::Style::solid()
                 .color(inactive_color.into())
-                .thickness(2.)
+                .thickness(2.),
         )
     } else {
         widget::Circle::fill_with(BTN_RADIUS, color.into())
     };
 
     widget = widget
-            .parent(parent)
-            .graphics_for(parent)
-            .w_h(BTN_RADIUS, BTN_RADIUS);
+        .parent(parent)
+        .graphics_for(parent)
+        .w_h(BTN_RADIUS, BTN_RADIUS);
 
     (widget, text_color)
 }
