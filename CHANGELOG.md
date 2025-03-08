@@ -1,3 +1,14 @@
+# [v0.7.1] - 08/03/2025 - Maintenance release
+
+## Important note
+
+As I do not belong to the SSBM community anymore, this release is UNTESTED on real hardware
+
+## Software
+
+* Updated dependencies
+  * This is a tentative (untested) fix for Windows getting `TimedOut` errors (cf: https://github.com/serialport/serialport-rs/issues/29)
+
 # [v0.7.0] - 29/07/2023 - B0XX r3 & r4 support
 
 ## Important note
